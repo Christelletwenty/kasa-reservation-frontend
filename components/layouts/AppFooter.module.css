@@ -1,0 +1,17 @@
+.footer {
+  background: #ffffff;
+  padding: 5px 24px;
+}
+
+.inner {
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copy {
+  font-size: 0.85rem;
+  color: #565656;
+}

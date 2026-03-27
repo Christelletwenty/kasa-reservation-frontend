@@ -1,0 +1,54 @@
+.headerWrapper {
+  padding: 28px 24px 0;
+}
+
+.header {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 26px;
+  background: #ffffff;
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.headerLeft {
+  color: #0d0d0d;
+  font-size: 14px;
+}
+
+.headerLeft,
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex: 1;
+}
+
+.headerRight {
+  color: #99331a;
+}
+
+.headerCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.headerRight {
+  justify-content: flex-end;
+}
+
+.add-link {
+  color: #99331a;
+}
+
+.headerIcons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
