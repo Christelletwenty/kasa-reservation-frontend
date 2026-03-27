@@ -3,3 +3,69 @@
 :root {
   --background: #fffbf9;
 }
+
+html,
+body {
+  background-color: #fffbf9;
+  margin: 0;
+  padding: 0;
+}
+
+/* NOT FOUND */
+
+.notfoundContainer {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.notfoundTitle {
+  margin: 0;
+  font-size: 143px;
+  line-height: 1;
+  font-weight: 800;
+  color: #99331a;
+}
+
+.notfoundText {
+  margin: 32px 0 0;
+  max-width: 342px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: #111111;
+  text-wrap: balance;
+}
+
+.notfoundActions {
+  margin-top: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.notfoundButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 250px;
+  padding: 16px 24px;
+  border-radius: 10px;
+  background: #99331a;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.notfoundButton:hover {
+  opacity: 0.95;
+}
+
+.notfoundButton:focus-visible {
+  outline: 2px solid #99331a;
+  outline-offset: 4px;
+}

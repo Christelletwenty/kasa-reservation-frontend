@@ -1,7 +1,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 
 //Register a new user (password auth)
-export type Role = "owner" | "client";
+export type Role = "owner" | "client" | "admin";
 
 export interface AuthRegister {
   name: string;
