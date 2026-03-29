@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import AppHeader from "@/components/layouts/AppHeader";
-import AppFooter from "@/components/layouts/AppFooter";
-import AppShell from "@/components/layouts/AppShell";
+import AppHeader from "@/app/components/layouts/AppHeader";
+import AppFooter from "@/app/components/layouts/AppFooter";
+import AppShell from "@/app/components/layouts/AppShell";
 
 export const metadata: Metadata = {
   title: "Kasa",
