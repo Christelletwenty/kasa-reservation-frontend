@@ -29,7 +29,18 @@ export interface AuthLogin {
   password: string;
 }
 
-export interface AuthLoginErro extends ApiError {}
+export interface AuthLoginResponse {
+  token: string;
+  user: {
+    id: 0;
+    name: string;
+    email: string;
+    picture: string;
+    role: Role;
+  };
+}
+
+export interface AuthLoginError extends ApiError {}
 
 //Request a password reset
 export interface RequestResetPassword {

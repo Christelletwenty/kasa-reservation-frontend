@@ -60,6 +60,7 @@ export interface CreatePropertyError extends ApiError {}
 
 //Update a proprerty
 export interface UpdatePorperty {
+  id: string; //je l'ai ajouté mais il est pas dans l'api de swagger, du coup pas sur de moi là.
   title: string;
   description: string;
   cover: string;
