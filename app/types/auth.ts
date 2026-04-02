@@ -1,7 +1,4 @@
-import { ApiError } from "next/dist/server/api-utils";
-
-//Register a new user (password auth)
-export type Role = "owner" | "client" | "admin";
+import { Role, User } from "./users";
 
 export interface AuthRegister {
   name: string;
@@ -10,18 +7,10 @@ export interface AuthRegister {
   role: Role;
 }
 
-export interface AuthRegisterResponse {
+export interface AuthResponse {
   token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    picture: string;
-    role: Role;
-  };
+  user: User & { email: string };
 }
-
-export interface AuthRegisterError extends ApiError {}
 
 //Login with email and password
 export interface AuthLogin {
@@ -29,26 +18,13 @@ export interface AuthLogin {
   password: string;
 }
 
-export interface AuthLoginResponse {
-  token: string;
-  user: {
-    id: 0;
-    name: string;
-    email: string;
-    picture: string;
-    role: Role;
-  };
-}
-
-export interface AuthLoginError extends ApiError {}
-
 //Request a password reset
 export interface RequestResetPassword {
   email: string;
 }
 
 export interface RequestResetPasswordResponse {
-  ok: true;
+  ok: boolean;
   message: string;
   token: string;
 }
@@ -60,7 +36,5 @@ export interface ResetPassword {
 }
 
 export interface ResetPasswordResponse {
-  ok: true;
+  ok: boolean;
 }
-
-export interface ResetPasswordError extends ApiError {}

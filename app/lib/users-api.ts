@@ -1,21 +1,16 @@
-import {
-  AdminCreateUser,
-  ListUsersResponse,
-  UpdateUserResponse,
-  Users,
-} from "../types/users";
+import { User } from "../types/users";
 import { apiFetch } from "./api";
 
-export function getUsers(): Promise<Users> {
-  return apiFetch<ListUsersResponse>("/api/users", {
+export function getUsers(): Promise<User[]> {
+  return apiFetch<User[]>("/api/users", {
     method: "GET",
     auth: true,
   });
 }
 
 export function adminCreateUser(
-  adminCreateUserPayload: AdminCreateUser,
-): Promise<Users> {
+  adminCreateUserPayload: Omit<User, "id">,
+): Promise<User> {
   return apiFetch("/api/users", {
     method: "POST",
     auth: true,
@@ -23,16 +18,17 @@ export function adminCreateUser(
   });
 }
 
-export function getUserById(id: number): Promise<Users> {
-  return apiFetch<ListUsersResponse>(`/api/users/${id}`, {
+export function getUserById(id: number): Promise<User> {
+  return apiFetch<User>(`/api/users/${id}`, {
     method: "GET",
     auth: true,
   });
 }
 
-export function updateUserById(id: number): Promise<UpdateUserResponse> {
-  return apiFetch<UpdateUserResponse>(`/api/users/${id}`, {
+export function updateUserById(id: number, user: Partial<User>): Promise<User> {
+  return apiFetch<User>(`/api/users/${id}`, {
     method: "PATCH",
     auth: true,
+    body: JSON.stringify(user),
   });
 }

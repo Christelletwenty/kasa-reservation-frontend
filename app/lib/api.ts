@@ -5,16 +5,7 @@ import { BACKEND_URL } from "./config";
  * Type représentant la structure d'une erreur renvoyée par le backend.
  */
 type ApiErrorBody = {
-  message?: string;
-};
-
-/**
- * Type générique représentant une réponse réussie de l'API.
- */
-export type ApiSuccess<TData> = {
-  success?: boolean;
-  message?: string;
-  data: TData;
+  error?: string;
 };
 
 /**
@@ -79,8 +70,8 @@ export async function apiFetch<T>(
        * pour afficher une erreur plus précise.
        */
       const body = (await res.json()) as ApiErrorBody;
-      if (body?.message) {
-        message = body.message;
+      if (body?.error) {
+        message = body.error;
       }
     } catch {
       // Si le backend ne renvoie pas du JSON (texte brut par exemple),

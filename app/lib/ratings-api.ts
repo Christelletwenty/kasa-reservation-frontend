@@ -1,24 +1,29 @@
-import { AddRatingPropertyResponse, RatingResponse } from "../types/ratings";
+import { AddRatingPropertyResponse, Rating } from "../types/ratings";
 import { apiFetch } from "./api";
 
-export function getRatingsByProperty(id: number): Promise<RatingResponse> {
-  return apiFetch<RatingResponse>(`/api/properties/${id}/ratings`, {
+export function getRatingsByProperty(id: number): Promise<Rating> {
+  return apiFetch<Rating>(`/api/properties/${id}/ratings`, {
     method: "GET",
     auth: true,
   });
 }
 
 export function addRatingToProperty(
-  id: number,
+  propertyId: number,
+  userId: number,
   score: number,
   comment: string,
 ): Promise<AddRatingPropertyResponse> {
-  return apiFetch<AddRatingPropertyResponse>(`/api/properties/${id}/ratings`, {
-    method: "POST",
-    auth: true,
-    body: JSON.stringify({
-      score,
-      comment,
-    }),
-  });
+  return apiFetch<AddRatingPropertyResponse>(
+    `/api/properties/${propertyId}/ratings`,
+    {
+      method: "POST",
+      auth: true,
+      body: JSON.stringify({
+        user_id: userId,
+        score,
+        comment,
+      }),
+    },
+  );
 }

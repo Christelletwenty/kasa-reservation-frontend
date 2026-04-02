@@ -1,8 +1,7 @@
 import {
   AuthLogin,
-  AuthLoginResponse,
   AuthRegister,
-  AuthRegisterResponse,
+  AuthResponse,
   RequestResetPassword,
   RequestResetPasswordResponse,
   ResetPassword,
@@ -10,17 +9,15 @@ import {
 } from "../types/auth";
 import { apiFetch } from "./api";
 
-export function register(
-  registerPayload: AuthRegister,
-): Promise<AuthRegisterResponse> {
-  return apiFetch<AuthRegisterResponse>("/auth/register", {
+export function register(registerPayload: AuthRegister): Promise<AuthResponse> {
+  return apiFetch<AuthResponse>("/auth/register", {
     method: "POST",
     body: JSON.stringify(registerPayload),
   });
 }
 
-export function login(loginPayload: AuthLogin): Promise<AuthLoginResponse> {
-  return apiFetch<AuthLoginResponse>("/auth/login", {
+export function login(loginPayload: AuthLogin): Promise<AuthResponse> {
+  return apiFetch<AuthResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify(loginPayload),
   });

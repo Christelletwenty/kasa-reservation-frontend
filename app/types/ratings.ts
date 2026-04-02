@@ -1,46 +1,16 @@
-import { Role } from "./auth";
-import { ApiError } from "./errors";
+import { User } from "./users";
 
 //List rating for a property success
-export interface RatingResponse {
+export interface Rating {
   id: number;
   score: number;
   comment: string;
   created_at: Date;
-  user: {
-    id: number;
-    name: string;
-    picture: string;
-    role: Role;
-  };
-}
-
-export interface RatingError extends ApiError {}
-
-//Add rating to a property
-export interface AddRatingProperty {
-  user_id: number;
-  score: number;
-  comment: string;
+  user: User;
 }
 
 export interface AddRatingPropertyResponse {
   rating_avg: 0;
   ratings_count: 0;
-  ratings: [
-    {
-      id: number;
-      score: number;
-      comment: string;
-      created_at: Date;
-      user: {
-        id: number;
-        name: string;
-        picture: string;
-        role: Role;
-      };
-    },
-  ];
+  ratings: Rating[];
 }
-
-export interface AddRatingPropertyError extends ApiError {}

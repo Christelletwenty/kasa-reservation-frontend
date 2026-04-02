@@ -1,7 +1,5 @@
-import { ApiError } from "./errors";
-
 //List properties
-export interface Properties {
+export interface Property {
   id: string;
   slug: string;
   title: string;
@@ -16,51 +14,25 @@ export interface Properties {
     name: string;
     picture: string;
   };
+  pictures?: string[];
+  equipments?: string[];
+  tags?: string[];
 }
 
 //Create a property
-export interface CreateProperty {
-  id: string;
-  title: string;
-  description: string;
-  cover: string;
-  location: string;
-  price_per_night: number;
+// Omit permet de créer un type en excluant certaines propriétés d'un autre type.
+// Ici, on crée un type CreateProperty qui est basé sur le type Property, mais sans les propriétés "slug", "rating_avg" et "ratings_count".
+// On ajoute également une propriété "host_id" qui est nécessaire pour créer une nouvelle propriété, mais qui n'est pas présente dans le type Property original.
+export interface CreateProperty extends Omit<
+  Property,
+  "slug" | "rating_avg" | "ratings_count"
+> {
   host_id: number;
-  host: {
-    name: string;
-    picture: string;
-  };
-  pictures: [string];
-  equipments: [string];
-  tags: [string];
 }
-
-export interface CreatePropertyResponse {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  cover: string;
-  location: string;
-  price_per_night: number;
-  rating_avg: number;
-  ratings_count: number;
-  host: {
-    id: 0;
-    name: string;
-    picture: string;
-  };
-  pictures: [string];
-  equipments: [string];
-  tags: [string];
-}
-
-export interface CreatePropertyError extends ApiError {}
 
 //Update a proprerty
 export interface UpdatePorperty {
-  id: string; //je l'ai ajouté mais il est pas dans l'api de swagger, du coup pas sur de moi là.
+  id: string;
   title: string;
   description: string;
   cover: string;
@@ -68,26 +40,3 @@ export interface UpdatePorperty {
   host_id: number;
   price_per_night: number;
 }
-export interface UpdatePorpertyResponse {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  cover: string;
-  location: string;
-  price_per_night: number;
-  rating_avg: number;
-  ratings_count: number;
-  host: {
-    id: number;
-    name: string;
-    picture: string;
-  };
-  pictures: [string];
-  equipments: [string];
-  tags: [string];
-}
-
-export interface UpdatePorpertyError extends ApiError {}
-
-export interface DeletePropertyError extends ApiError {}

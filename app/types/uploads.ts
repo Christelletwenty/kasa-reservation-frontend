@@ -1,5 +1,3 @@
-import { ApiError } from "./errors";
-
 export type Purpose = "property-cover" | "property-picture" | "user-picture";
 
 //Uploads
@@ -19,4 +17,19 @@ export interface UploadImageResponse {
   instructions: string;
 }
 
-export interface UploadImageError extends ApiError {}
+export interface DeleteImageResponse {
+  filename: string;
+}
+
+export interface DeleteImageResponse {
+  ok: true;
+  deleted: string[];
+  not_found: string[];
+  errors: [
+    {
+      filename: string;
+      error: string;
+    },
+  ];
+  results: [{}];
+}
