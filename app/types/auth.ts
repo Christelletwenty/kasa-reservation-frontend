@@ -10,6 +10,7 @@ export interface AuthRegister {
 export interface AuthResponse {
   token: string;
   user: User & { email: string };
+  error?: string;
 }
 
 //Login with email and password

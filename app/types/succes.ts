@@ -1,3 +1,3 @@
-export interface StatusOk {
+export interface Success {
   ok: boolean;
 }
