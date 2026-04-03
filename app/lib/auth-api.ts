@@ -26,7 +26,7 @@ export function login(loginPayload: AuthLogin): Promise<AuthResponse> {
 export function resetPasswordRequest(
   resetRequestPayload: RequestResetPassword,
 ): Promise<RequestResetPasswordResponse> {
-  return apiFetch<RequestResetPasswordResponse>("/aut/request-reset", {
+  return apiFetch<RequestResetPasswordResponse>("/auth/request-reset", {
     method: "POST",
     body: JSON.stringify(resetRequestPayload),
   });
