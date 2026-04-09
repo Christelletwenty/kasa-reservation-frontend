@@ -1,7 +1,47 @@
 "use client";
+import { useRouter } from "next/navigation";
 import styles from "./RegisterPage.module.css";
+import { AuthRegister } from "@/app/types/auth";
+import { useState } from "react";
+import { register } from "@/app/lib/auth-api";
+import { setToken } from "@/app/lib/auth";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState<AuthRegister>({
+    name: "",
+    email: "",
+    password: "",
+    role: "client",
+  });
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const registerResponse = await register(form);
+      if (registerResponse.error) {
+        setError(registerResponse.error);
+        return;
+      }
+
+      setToken(registerResponse.token);
+      router.replace("/");
+      router.refresh();
+      return;
+    } catch (err) {
+      const error =
+        err instanceof Error ? err.message : "Une erreur est survenue";
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={styles.register__page}>
       <h1>Rejoignez la communauté Kasa</h1>
@@ -11,7 +51,7 @@ export default function RegisterPage() {
         propres lieux avec d’autres voyageurs.
       </p>
       <div className={styles.register__form__container}>
-        <form className={styles.register__form}>
+        <form className={styles.register__form} onSubmit={onSubmit}>
           <label className={styles.register__label} htmlFor="name">
             Nom
           </label>
@@ -20,16 +60,13 @@ export default function RegisterPage() {
             type="name"
             id="name"
             required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <label className={styles.register__label} htmlFor="prenom">
             Prénom
           </label>
-          <input
-            className={styles.register__input}
-            type="prenom"
-            id="prenom"
-            required
-          />
+          <input className={styles.register__input} type="prenom" id="prenom" />
           <label htmlFor="email" className={styles.register__label}>
             Adresse email
           </label>
@@ -38,6 +75,8 @@ export default function RegisterPage() {
             type="email"
             id="email"
             required
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <label htmlFor="password" className={styles.register__label}>
             Mot de passe
@@ -47,20 +86,25 @@ export default function RegisterPage() {
             type="password"
             id="password"
             required
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
 
           <label className={styles.register__conditions}>
             <input type="checkbox" required />
-            J'accepte les {""}
+            J'accepte les{" "}
             <a href="/conditions">conditions générales d'utilisation</a>
           </label>
 
-          <button type="submit" className={styles.register__button}>
-            S'inscrire
+          {error ? <p className="register__error">{error}</p> : null}
+
+          <button
+            type="submit"
+            className={styles.register__button}
+            disabled={loading}
+          >
+            {loading ? "Inscription en cours..." : "S'inscrire"}
           </button>
-          <a className={styles.register__link} href="#">
-            Mot de passe oublié
-          </a>
         </form>
         <p className={styles.register__footer}>
           Déjà membre ?{" "}

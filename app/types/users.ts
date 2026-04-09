@@ -4,6 +4,7 @@ export type Role = "owner" | "client" | "admin";
 export interface User {
   id: number;
   name: string;
-  picture: string;
+  email: string;
+  picture: string | null;
   role: Role;
 }
