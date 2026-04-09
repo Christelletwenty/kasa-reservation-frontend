@@ -1,9 +1,36 @@
 "use client";
-
+import { useEffect, useState } from "react";
+import { Property } from "../types/properties";
 import PropertyCard from "./components/PropertyCard";
 import styles from "./PropertiesPage.module.css";
+import { getProperties } from "../lib/properties-api";
 
 export default function PropertiesPage() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // effect avec un call pour appeler l'API
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const propertieResponse = await Promise.all([getProperties()]);
+        setProperties(propertieResponse[0]);
+      } catch (err) {
+        setError("Erreur lors du chargement des propriétés");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []); //call qu'une fois au chargement de la page
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
   return (
     <div className={styles.properties__page}>
       <div className={styles.properties__content}>
@@ -20,7 +47,42 @@ export default function PropertiesPage() {
           className={styles.properties__image}
         />
       </div>
-      <PropertyCard />
+      <div className={styles.properties__cards}>
+        {properties.map((p) => (
+          <PropertyCard key={p.id} property={p} />
+        ))}
+      </div>
+      <div className={styles.properties__howItWorks}>
+        <h2 className={styles.properties__howItWorksTitle}>
+          Comment ça marche ?
+        </h2>
+        <span className={styles.properties__howItWorksDescription}>
+          Que vous partiez pour un week-end improvisé, des vacances en famille
+          ou un voyage professionnel, Kasa vous aide à trouver un lieu qui vous
+          ressemble.
+        </span>
+        <div className={styles.properties__howItWorksStep}>
+          <h3 className={styles.properties__howItWorksStepTitle}>Recherchez</h3>
+          <p className={styles.properties__howItWorksStepDescription}>
+            Entrez votre destination, vos dates et laissez Kasa faire le reste
+          </p>
+        </div>
+        <div className={styles.properties__howItWorksStep}>
+          <h3 className={styles.properties__howItWorksStepTitle}>Réservez</h3>
+          <p className={styles.properties__howItWorksStepDescription}>
+            Profitez d’une plateforme sécurisée et de profils d’hôtes vérifiés.
+          </p>
+        </div>
+        <div className={styles.properties__howItWorksStep}>
+          <h3 className={styles.properties__howItWorksStepTitle}>
+            Vivez l’expérience
+          </h3>
+          <p className={styles.properties__howItWorksStepDescription}>
+            Installez-vous, profitez de votre séjour, et sentez-vous chez vous,
+            partout.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
