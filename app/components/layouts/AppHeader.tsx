@@ -9,11 +9,11 @@ export default function AppHeader() {
     <header className={styles.headerWrapper}>
       <nav className={styles.header}>
         <div className={styles.headerLeft}>
-          <Link href="/">Accueil</Link>
+          <Link href="/properties">Accueil</Link>
           <Link href="/about">À propos</Link>
         </div>
         <div className={styles.headerCenter}>
-          <Link href="/">
+          <Link href="/properties">
             <img src="/kasa-logo.svg" alt="Kasa" width={120} height={40} />
           </Link>
         </div>
