@@ -35,12 +35,12 @@ export default function PropertiesPage() {
     <div className={styles.properties__page}>
       <div className={styles.properties__content}>
         <h1 className={styles.properties__title}>
-          Chez vous , partout ailleurs
+          Chez vous, partout ailleurs
         </h1>
-        <span className={styles.properties__description}>
+        <p className={styles.properties__description}>
           Avec Kasa, vivez des séjours uniques dans des hébergements chaleureux,
           sélectionnés avec soin par nos hôtes.
-        </span>
+        </p>
         <img
           src="kasa-properties.png"
           alt="kasa-properties"
@@ -56,31 +56,36 @@ export default function PropertiesPage() {
         <h2 className={styles.properties__howItWorksTitle}>
           Comment ça marche ?
         </h2>
-        <span className={styles.properties__howItWorksDescription}>
+        <p className={styles.properties__howItWorksDescription}>
           Que vous partiez pour un week-end improvisé, des vacances en famille
           ou un voyage professionnel, Kasa vous aide à trouver un lieu qui vous
           ressemble.
-        </span>
-        <div className={styles.properties__howItWorksStep}>
-          <h3 className={styles.properties__howItWorksStepTitle}>Recherchez</h3>
-          <p className={styles.properties__howItWorksStepDescription}>
-            Entrez votre destination, vos dates et laissez Kasa faire le reste
-          </p>
-        </div>
-        <div className={styles.properties__howItWorksStep}>
-          <h3 className={styles.properties__howItWorksStepTitle}>Réservez</h3>
-          <p className={styles.properties__howItWorksStepDescription}>
-            Profitez d’une plateforme sécurisée et de profils d’hôtes vérifiés.
-          </p>
-        </div>
-        <div className={styles.properties__howItWorksStep}>
-          <h3 className={styles.properties__howItWorksStepTitle}>
-            Vivez l’expérience
-          </h3>
-          <p className={styles.properties__howItWorksStepDescription}>
-            Installez-vous, profitez de votre séjour, et sentez-vous chez vous,
-            partout.
-          </p>
+        </p>
+        <div className={styles.properties__howItWorksSteps}>
+          <div className={styles.properties__howItWorksStep}>
+            <h3 className={styles.properties__howItWorksStepTitle}>
+              Recherchez
+            </h3>
+            <p className={styles.properties__howItWorksStepDescription}>
+              Entrez votre destination, vos dates et laissez Kasa faire le reste
+            </p>
+          </div>
+          <div className={styles.properties__howItWorksStep}>
+            <h3 className={styles.properties__howItWorksStepTitle}>Réservez</h3>
+            <p className={styles.properties__howItWorksStepDescription}>
+              Profitez d’une plateforme sécurisée et de profils d’hôtes
+              vérifiés.
+            </p>
+          </div>
+          <div className={styles.properties__howItWorksStep}>
+            <h3 className={styles.properties__howItWorksStepTitle}>
+              Vivez l’expérience
+            </h3>
+            <p className={styles.properties__howItWorksStepDescription}>
+              Installez-vous, profitez de votre séjour, et sentez-vous chez
+              vous, partout.
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -14,7 +14,7 @@ export interface Property {
     name: string;
     picture: string;
   };
-  pictures?: string[];
+  pictures?: string;
   equipments?: string[];
   tags?: string[];
 }
