@@ -30,7 +30,7 @@ export default function RegisterPage() {
       }
 
       setToken(registerResponse.token);
-      router.replace("/");
+      router.replace("/properties");
       router.refresh();
       return;
     } catch (err) {
@@ -93,7 +93,9 @@ export default function RegisterPage() {
           <label className={styles.register__conditions}>
             <input type="checkbox" required />
             J'accepte les{" "}
-            <a href="/conditions">conditions générales d'utilisation</a>
+            <a target="_blank" href="/conditions">
+              conditions générales d'utilisation
+            </a>
           </label>
 
           {error ? <p className="register__error">{error}</p> : null}
