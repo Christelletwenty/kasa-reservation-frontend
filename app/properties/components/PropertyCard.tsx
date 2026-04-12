@@ -61,7 +61,6 @@ export default function PropertyCard({
           disabled={isLoading}
           className={`${styles.properties__favorites} ${isFavorite ? styles.properties__favoritesActive : ""}`}
         >
-          {/* <img src="favorites-icon.png" alt="Favorites" /> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
