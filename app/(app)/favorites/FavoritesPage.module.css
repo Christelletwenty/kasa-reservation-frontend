@@ -42,6 +42,9 @@
   opacity: 0.8;
 }
 
+.favorites__notfound img {
+  max-height: 50vh;
+}
 .properties__cards {
   display: grid;
   grid-template-columns: repeat(3, 300px);

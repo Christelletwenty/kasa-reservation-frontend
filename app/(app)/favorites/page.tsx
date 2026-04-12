@@ -45,7 +45,7 @@ export default function FavoritesPage() {
               <p className={styles.favorites__notfound_txt}>
                 Vous n'avez aucun favoris pour le moment
               </p>
-              <img src="/favorites-not-found.svg" alt="Favorite not found" />
+              <img src="/no-favorites.svg" alt="Favorite not found" />
             </>
           ) : null}
         </div>
