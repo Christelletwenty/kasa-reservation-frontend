@@ -1,12 +1,6 @@
 import type { User } from "../types/users";
-
-const TOKEN_KEY = "token";
-const USER_KEY = "user";
-
-type LoginResponse = {
-  token: string;
-  user: User;
-};
+import { getToken } from "./auth";
+import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from "./config";
 
 type JwtPayload = {
   id?: number | string;
@@ -17,17 +11,8 @@ type JwtPayload = {
   exp?: number;
 };
 
-export function saveAuth(data: LoginResponse): void {
-  localStorage.setItem(TOKEN_KEY, data.token);
-  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-}
-
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
 export function getStoredUser(): User | null {
-  const rawUser = localStorage.getItem(USER_KEY);
+  const rawUser = sessionStorage.getItem(USER_STORAGE_KEY);
 
   if (!rawUser) {
     return null;
@@ -43,11 +28,12 @@ export function getStoredUser(): User | null {
 export function getStoredUserId(): number | null {
   const user = getStoredUser();
 
-  if (!user) {
+  if (!user || user.id === undefined || user.id === null) {
     return null;
   }
 
-  return typeof user.id === "number" ? user.id : null;
+  const userId = Number(user.id);
+  return Number.isNaN(userId) ? null : userId;
 }
 
 export function getUserIdFromToken(): number | null {
@@ -78,9 +64,4 @@ export function getUserIdFromToken(): number | null {
   } catch {
     return null;
   }
-}
-
-export function clearToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
 }

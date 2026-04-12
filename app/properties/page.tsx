@@ -4,9 +4,12 @@ import { Property } from "../types/properties";
 import PropertyCard from "./components/PropertyCard";
 import styles from "./PropertiesPage.module.css";
 import { getProperties } from "../lib/properties-api";
+import { getFavoritesUsers } from "../lib/favorites-api";
+import { getStoredUserId } from "../lib/auth-guard";
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
+  const [favProperties, setFavProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -17,8 +20,12 @@ export default function PropertiesPage() {
         setLoading(true);
         setError("");
 
-        const propertieResponse = await Promise.all([getProperties()]);
-        setProperties(propertieResponse[0]);
+        const [propertieResponse, favoritesResponse] = await Promise.all([
+          getProperties(),
+          getFavoritesUsers(getStoredUserId()!),
+        ]);
+        setProperties(propertieResponse);
+        setFavProperties(favoritesResponse);
       } catch (err) {
         setError("Erreur lors du chargement des propriétés");
       } finally {
@@ -49,7 +56,20 @@ export default function PropertiesPage() {
       </div>
       <div className={styles.properties__cards}>
         {properties.map((p) => (
-          <PropertyCard key={p.id} property={p} />
+          <PropertyCard
+            key={p.id}
+            property={p}
+            favorites={favProperties.some((fav) => fav.id === p.id)}
+            favoriteChanged={(fav) => {
+              if (fav) {
+                setFavProperties((prev) => [...prev, p]);
+              } else {
+                setFavProperties((prev) =>
+                  prev.filter((fav) => fav.id !== p.id),
+                );
+              }
+            }}
+          />
         ))}
       </div>
       <div className={styles.properties__howItWorks}>

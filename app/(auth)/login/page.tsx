@@ -4,7 +4,7 @@ import styles from "./LoginPage.module.css";
 import { useRouter } from "next/navigation";
 import { AuthLogin } from "@/app/types/auth";
 import { login } from "@/app/lib/auth-api";
-import { setToken } from "@/app/lib/auth";
+import { saveAuth, setToken } from "@/app/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,8 +28,8 @@ export default function LoginPage() {
         return;
       }
 
-      setToken(loginResponse.token);
-      router.replace("/");
+      saveAuth(loginResponse);
+      router.replace("/properties");
       router.refresh();
     } catch (err) {
       const error =

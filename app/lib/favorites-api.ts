@@ -3,7 +3,7 @@ import { Properties } from "../types/properties";
 import { apiFetch } from "./api";
 
 export function addPropertiesToFavorites(
-  id: number,
+  id: string,
 ): Promise<FavoritesResponse> {
   return apiFetch<FavoritesResponse>(`/api/properties/${id}/favorite`, {
     method: "POST",
@@ -11,7 +11,7 @@ export function addPropertiesToFavorites(
   });
 }
 export function deletePropertiesFromFavorites(
-  id: number,
+  id: string,
 ): Promise<FavoritesResponse> {
   return apiFetch<FavoritesResponse>(`/api/properties/${id}/favorite`, {
     method: "DELETE",

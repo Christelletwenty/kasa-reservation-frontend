@@ -20,9 +20,13 @@ export default function AppHeader() {
         <div className={styles.headerRight}>
           <Link href="/add">+ Ajouter un logement</Link>
           <div className={styles.headerIcons}>
-            <img src="/heart-icon.svg" alt="Favoris" width={20} height={20} />
+            <Link href="/favorites">
+              <img src="/heart-icon.svg" alt="Favoris" width={20} height={20} />
+            </Link>
             <img src="/line.svg" alt="Séparateur" width={1} height={20} />
-            <img src="/comment.svg" alt="Messages" width={20} height={20} />
+            <Link href="/messages">
+              <img src="/comment.svg" alt="Messages" width={20} height={20} />
+            </Link>
           </div>
         </div>
       </nav>

@@ -1,6 +1,12 @@
 // On importe une constante contenant la clé utilisée dans le sessionStorage.
 // Cela évite de répéter une string partout dans le code et centralise la configuration.
-import { TOKEN_STORAGE_KEY } from "./config";
+import { AuthResponse } from "../types/auth";
+import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from "./config";
+
+export function saveAuth(data: AuthResponse): void {
+  sessionStorage.setItem(TOKEN_STORAGE_KEY, data.token);
+  sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+}
 
 // Cette fonction sauvegarde le token d'authentification dans le sessionStorage.
 // Le token est généralement reçu après un login réussi.
@@ -20,6 +26,7 @@ export function getToken(): string | null {
 // Elle est typiquement utilisée lors du logout.
 export function clearToken(): void {
   sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+  sessionStorage.removeItem(USER_STORAGE_KEY);
 }
 
 // Cette fonction vérifie si l'utilisateur est authentifié.

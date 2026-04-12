@@ -1,3 +1,47 @@
+.favorites__page {
+  width: 100%;
+  min-height: 100vh;
+  background: #fffbf9;
+  padding: 32px 24px 80px;
+  box-sizing: border-box;
+}
+
+.favorites__content {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.favorites__title {
+  margin: 24px 0 16px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #99331a;
+  letter-spacing: -0.02em;
+}
+
+.favorites__description {
+  display: block;
+  max-width: 760px;
+  margin-bottom: 40px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #000000;
+}
+
+.favorites__notfound_txt {
+  margin: 24px 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #99331a;
+  opacity: 0.8;
+}
+
 .properties__card {
   background: #f2eeec;
   border-radius: 20px;

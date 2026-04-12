@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  clearToken,
-  getStoredUserId,
-  getToken,
-  getUserIdFromToken,
-} from "../lib/auth-guard";
+import { getStoredUserId, getUserIdFromToken } from "../lib/auth-guard";
 import { getUserById } from "../lib/users-api";
 import type { User } from "../types/users";
+import { clearToken, getToken } from "../lib/auth";
 
 type UseAuthGuardResult = {
   user: User | null;
@@ -25,17 +21,25 @@ export function useAuthGuard(): UseAuthGuardResult {
   useEffect(() => {
     const checkAuth = async (): Promise<void> => {
       const token = getToken();
+      const storedUserId = getStoredUserId();
+      const tokenUserId = getUserIdFromToken();
+      const userId = storedUserId ?? tokenUserId;
+
+      console.log("token:", token);
+      console.log("storedUserId:", storedUserId);
+      console.log("tokenUserId:", tokenUserId);
+      console.log("final userId:", userId);
 
       if (!token) {
+        console.log("Pas de token");
         setUser(null);
         setIsLoading(false);
         router.replace("/login");
         return;
       }
 
-      const userId = getStoredUserId() ?? getUserIdFromToken();
-
       if (!userId) {
+        console.log("Pas de userId");
         clearToken();
         setUser(null);
         setIsLoading(false);
@@ -44,15 +48,19 @@ export function useAuthGuard(): UseAuthGuardResult {
       }
 
       try {
+        console.log("Appel getUserById avec:", userId);
         const currentUser = await getUserById(userId);
+        console.log("currentUser:", currentUser);
         setUser(currentUser);
-      } catch {
-        clearToken();
+      } catch (error) {
+        console.error("Erreur getUserById:", error);
         setUser(null);
-        router.replace("/login");
-      } finally {
         setIsLoading(false);
+        router.replace("/login");
+        return;
       }
+
+      setIsLoading(false);
     };
 
     void checkAuth();

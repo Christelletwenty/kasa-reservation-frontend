@@ -10,6 +10,7 @@ if (!BACKEND_URL) {
 }
 
 // Clé utilisée pour stocker le token d'authentification dans le navigateur
-// (souvent dans localStorage ou sessionStorage).
+// (souvent dans sessionStorage ou sessionStorage).
 // Centraliser cette clé évite les fautes de frappe et facilite la maintenance.
 export const TOKEN_STORAGE_KEY = "auth_token";
+export const USER_STORAGE_KEY = "user";
