@@ -1,11 +1,12 @@
 "use client";
 import { Property } from "@/app/types/properties";
 import styles from "./PropertiesCard.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   addPropertiesToFavorites,
   deletePropertiesFromFavorites,
 } from "@/app/lib/favorites-api";
+import { useRouter } from "next/navigation";
 
 type PropertiesProps = {
   property: Property;
@@ -18,15 +19,17 @@ export default function PropertyCard({
   favorites,
   favoriteChanged,
 }: PropertiesProps) {
+  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useState(() => {
+  useEffect(() => {
     setIsFavorite(!!favorites);
-  });
+  }, [favorites]);
 
-  const handleFavorite = async () => {
+  const handleFavorite = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Empêche la propagation du clic pour éviter de déclencher la navigation vers les détails de la propriété
     try {
       setIsLoading(true);
       setError(null);
@@ -47,8 +50,12 @@ export default function PropertyCard({
     }
   };
 
+  const handleNavToDetail = () => {
+    router.push(`/properties/${property.id}`);
+  };
+
   return (
-    <div className={styles.properties__card}>
+    <div onClick={handleNavToDetail} className={styles.properties__card}>
       <div className={styles.properties__imageWrapper}>
         <img
           className={styles.properties__imagecard}
