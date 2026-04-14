@@ -28,7 +28,7 @@ export default function AppHeader() {
           </Link>
         </div>
         <div className={styles.headerRight}>
-          <Link href="/add">+ Ajouter un logement</Link>
+          <Link href="/propertie">+ Ajouter un logement</Link>
           <div className={styles.headerIcons}>
             <Link href="/favorites">
               <img src="/heart-icon.svg" alt="Favoris" width={20} height={20} />
