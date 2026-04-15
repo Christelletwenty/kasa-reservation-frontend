@@ -10,9 +10,9 @@
   align-items: center;
   gap: 10px;
   border: none;
-  background: #f1f1f1;
-  color: #4a4a4a;
-  font-size: 16px;
+  background: #f5f5f5;
+  color: #565656;
+  font-size: 14px;
   font-weight: 500;
   padding: 14px 20px;
   border-radius: 14px;
@@ -97,9 +97,9 @@
 
 .properties__detailUserName {
   margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-  color: #222222;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
   align-self: center;
 }
 
@@ -142,9 +142,8 @@
   border-radius: 12px;
   height: 36px;
   font-size: 14px;
-  font-weight: 500;
   color: #ffffff;
-  background: #a63d1f;
+  background: #99331a;
   cursor: pointer;
   transition:
     background 0.2s ease,
@@ -171,16 +170,17 @@
 
 .properties__detailPropertieTitle {
   margin: 0 0 10px;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.2;
-  font-weight: 600;
-  color: #111111;
+  font-weight: 500;
+  color: #000000;
 }
 
 .properties__detailPropertieLocation {
   margin: 0 0 28px;
-  font-size: 18px;
-  color: #6b6b6b;
+  font-size: 14px;
+  font-weight: 400;
+  color: #565656;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -188,9 +188,10 @@
 
 .properties__detailPropertieDescription {
   margin: 0;
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.7;
-  color: #232323;
+  color: #000000;
   max-width: 92%;
 }
 
@@ -201,9 +202,9 @@
 .properties__equipmentsTitle,
 .properties__categoryTitle {
   margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 600;
-  color: #111111;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
 }
 
 .properties__equipmentsChips,
@@ -223,9 +224,9 @@
     padding: 0 18px;
     background: #f5f5f5;
     border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #707070;
+    font-size: 12px;
+    font-weight: 400;
+    color: #565656;
   }
 }
 
