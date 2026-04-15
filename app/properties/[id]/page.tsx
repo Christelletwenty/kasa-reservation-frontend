@@ -4,6 +4,7 @@ import styles from "./PropertiesDetailPage.module.css";
 import { useEffect, useState } from "react";
 import { Property } from "@/app/types/properties";
 import { useParams, useRouter } from "next/navigation";
+import { BACKEND_URL } from "@/app/lib/config";
 
 export default function PropertyDetailPage() {
   const router = useRouter();
@@ -145,7 +146,10 @@ export default function PropertyDetailPage() {
         <div className={styles.properties__detailHost}>
           <h2 className={styles.properties__detailHostTitle}>Votre hôte</h2>
           <div className={styles.properties__detailHostInfo}>
-            <img src={property.host.picture} alt={property.host.picture} />
+            <img
+              src={`${property.host.picture.startsWith("http") ? "" : BACKEND_URL}${property.host.picture}`}
+              alt={property.host.picture}
+            />
             <p className={styles.properties__detailUserName}>
               {property.host.name}
             </p>

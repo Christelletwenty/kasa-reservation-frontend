@@ -157,6 +157,7 @@ textarea.createProperty__input {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  align-self: stretch;
 }
 
 .imageCard,
@@ -166,10 +167,11 @@ textarea.createProperty__input {
   border-radius: 16px;
   padding: 34px 38px;
   box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
   gap: 28px;
+  flex: 1 1 auto;
+  justify-content: center;
 }
 
 .imageBlock {
@@ -223,6 +225,50 @@ textarea.createProperty__input {
   font-weight: 400;
   color: #99331a;
   cursor: pointer;
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: fit-content;
+}
+
+.imageDelete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageDelete:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.imagePreview {
+  width: 100%;
+  max-width: 140px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ece6e2;
+  display: block;
+  background: #f5f5f5;
 }
 
 .property__equipments {
@@ -299,6 +345,7 @@ textarea.createProperty__input {
     color 0.2s ease;
 }
 
+.property__category__chip.selected,
 .property__category__chip:hover {
   background: #e8dfda;
   color: #4e443f;

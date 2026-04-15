@@ -25,9 +25,11 @@ export interface Property {
 // On ajoute également une propriété "host_id" qui est nécessaire pour créer une nouvelle propriété, mais qui n'est pas présente dans le type Property original.
 export interface CreateProperty extends Omit<
   Property,
-  "slug" | "rating_avg" | "ratings_count"
+  "id" | "slug" | "rating_avg" | "ratings_count" | "host"
 > {
   host_id: number;
+  equipments: string[];
+  tags: string[];
 }
 
 //Update a proprerty

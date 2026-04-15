@@ -1,46 +1,282 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
 import styles from "./CreateProperty.module.css";
+import { useAuthGuard } from "@/app/hooks/useAuthGuard";
+import { createProperty } from "@/app/lib/properties-api";
+import { uploadImage } from "@/app/lib/upload-api";
+import { CreateProperty } from "@/app/types/properties";
+import { BACKEND_URL } from "@/app/lib/config";
+import { updateUserById } from "@/app/lib/users-api";
 
 export default function CreatePropertyPage() {
   const router = useRouter();
+  const { user: currentUser, isLoading: authLoading } = useAuthGuard();
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [customTag, setCustomTag] = useState("");
+
+  const possibleEquipments = [
+    "Micro-Ondes",
+    "Douche italienne",
+    "Frigo",
+    "WIFI",
+    "Parking",
+    "Sèche Cheveux",
+    "Machine à laver",
+    "Cuisine équipée",
+    "Télévision",
+    "Chambre Séparée",
+    "Climatisation",
+    "Frigo Américain",
+    "Clic-clac",
+    "Four",
+    "Rangements",
+    "Lit",
+    "Bouilloire",
+    "SDB",
+    "Toilettes sèches",
+    "Cintres",
+    "Baie vitrée",
+    "Hotte",
+    "Baignoire",
+    "Vue Parc",
+  ];
+
+  const possibleCategories = [
+    "Parc",
+    "Night Life",
+    "Culture",
+    "Nature",
+    "Touristique",
+    "Vue sur mer",
+    "Pour les couples",
+    "Famille",
+    "Forêt",
+  ];
+  const [form, setForm] = useState<CreateProperty>({
+    title: "",
+    description: "",
+    cover: "",
+    location: "",
+    price_per_night: 0,
+    pictures: [],
+    equipments: [],
+    host_id: 0,
+    tags: [],
+  });
+
+  const pictureToDisplay = profilePicture ?? currentUser?.picture;
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    setForm((prev) => ({
+      ...prev,
+      host_id: currentUser.id,
+    }));
+  }, [currentUser]);
+
+  const handleRemovePicture = (indexToRemove: number) => {
+    setForm((prev) => ({
+      ...prev,
+      pictures: (prev.pictures ?? []).filter(
+        (_, index) => index !== indexToRemove,
+      ),
+    }));
+  };
+
+  const handleRemoveProfilePicture = async () => {
+    if (!currentUser) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      await updateUserById(currentUser.id, {
+        picture: "",
+      });
+
+      setProfilePicture(null);
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la suppression de la photo de profil";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfilePictureChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const uploadedImage = await uploadImage(file, "user-picture");
+      setProfilePicture(uploadedImage.url);
+
+      await updateUserById(currentUser.id, {
+        picture: uploadedImage.url,
+      });
+
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de l'upload de la photo de profil";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const uploadedImage = await uploadImage(file, "property-cover");
+
+      setForm((prev) => ({
+        ...prev,
+        cover: `${BACKEND_URL}${uploadedImage.url}`,
+      }));
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de l'upload de l'image de couverture";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePicturesChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const uploadedImages = await Promise.all(
+        Array.from(files).map((file) => uploadImage(file, "property-picture")),
+      );
+
+      const uploadedUrls = uploadedImages.map(
+        (image) => `${BACKEND_URL}${image.url}`,
+      );
+
+      setForm((prev) => ({
+        ...prev,
+        pictures: [...(prev.pictures ?? []), ...uploadedUrls],
+      }));
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de l'upload des images du logement";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError("");
+
+      await createProperty(form);
+      router.push("/properties");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Une erreur est survenue";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (authLoading) {
+    return <p>Chargement...</p>;
+  }
+
+  if (!currentUser) {
+    return <p>Vous devez être connecté pour créer une propriété.</p>;
+  }
+
+  const pictures = form.pictures ?? [];
+
+  const tags = form.tags ?? [];
+
+  const allCategories = [
+    ...possibleCategories,
+    ...tags.filter((tag) => !possibleCategories.includes(tag)),
+  ];
 
   return (
     <div className={styles.createProperty__page}>
-      <div className={styles.createProperty__page__actions}>
-        <button
-          onClick={() => router.push("/properties")}
-          className={styles.properties__backButton}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-4"
+      <form
+        onSubmit={handleSubmit}
+        className={styles.createproperty__container}
+      >
+        <div className={styles.createProperty__page__actions}>
+          <button
+            type="button"
+            onClick={() => router.push("/properties")}
+            className={styles.properties__backButton}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
-          Retour
-        </button>
-        <div className={styles.properties__addProperty}>
-          <h1>Ajouter une propriété</h1>
-          <button>Ajouter</button>
-        </div>
-      </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+            Retour
+          </button>
 
-      <div className={styles.createproperty__container}>
+          <div className={styles.properties__addProperty}>
+            <h1>Ajouter une propriété</h1>
+            <button type="submit" disabled={loading}>
+              {loading ? "Ajout..." : "Ajouter"}
+            </button>
+          </div>
+        </div>
         <div className={styles.createproperty__form_container}>
-          <form className={styles.createproperty__form}>
+          <div className={styles.properties__addProperty}></div>
+          <div className={styles.createproperty__form}>
             <label
               className={styles.createProperty__label}
-              htmlFor="Property title"
+              htmlFor="property-title"
             >
               Titre de la propriété
             </label>
@@ -48,12 +284,17 @@ export default function CreatePropertyPage() {
               className={styles.createProperty__input}
               type="text"
               id="property-title"
-              placeholder="Ex : Appartement cosy au coeur de paris"
+              placeholder="Ex : Appartement cosy au coeur de Paris"
               required
+              value={form.title}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, title: e.target.value }))
+              }
             />
+
             <label
               className={styles.createProperty__label}
-              htmlFor="Description"
+              htmlFor="description"
             >
               Description
             </label>
@@ -64,10 +305,18 @@ export default function CreatePropertyPage() {
               id="description"
               placeholder="Ex : Décrivez votre propriété en détail..."
               required
+              value={form.description}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
             />
+
             <label
               className={styles.createProperty__label}
-              htmlFor="Code postal"
+              htmlFor="postal-code"
             >
               Code postal
             </label>
@@ -75,11 +324,11 @@ export default function CreatePropertyPage() {
               className={styles.createProperty__input}
               type="number"
               id="postal-code"
-              required
             />
+
             <label
               className={styles.createProperty__label}
-              htmlFor="Localisation"
+              htmlFor="property-localisation"
             >
               Localisation
             </label>
@@ -88,9 +337,36 @@ export default function CreatePropertyPage() {
               type="text"
               id="property-localisation"
               required
+              value={form.location}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, location: e.target.value }))
+              }
             />
-          </form>
+
+            <label
+              className={styles.createProperty__label}
+              htmlFor="price-per-night"
+            >
+              Prix par nuit
+            </label>
+            <input
+              className={styles.createProperty__input}
+              type="number"
+              id="price-per-night"
+              min="0"
+              step="0.01"
+              required
+              value={form.price_per_night}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  price_per_night: parseFloat(e.target.value) || 0,
+                }))
+              }
+            />
+          </div>
         </div>
+
         <div className={styles.createProperty__coverImage}>
           <div className={styles.imageCard}>
             <div className={styles.imageBlock}>
@@ -99,7 +375,9 @@ export default function CreatePropertyPage() {
               </label>
 
               <div className={styles.imageField__row}>
-                <div className={styles.imageField__fakeInput}></div>
+                <div className={styles.imageField__fakeInput}>
+                  {form.cover ? "Image ajoutée" : ""}
+                </div>
 
                 <label
                   htmlFor="coverImage"
@@ -115,7 +393,25 @@ export default function CreatePropertyPage() {
                 type="file"
                 accept="image/*"
                 hidden
+                onChange={handleCoverChange}
               />
+
+              {form.cover && (
+                <div className={styles.imageWrapper}>
+                  <img
+                    src={form.cover}
+                    alt="Image de couverture"
+                    className={styles.imagePreview}
+                  />
+                  <button
+                    type="button"
+                    className={styles.imageDelete}
+                    onClick={() => setForm((prev) => ({ ...prev, cover: "" }))}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className={styles.imageBlock}>
@@ -127,7 +423,11 @@ export default function CreatePropertyPage() {
               </label>
 
               <div className={styles.imageField__row}>
-                <div className={styles.imageField__fakeInput}></div>
+                <div className={styles.imageField__fakeInput}>
+                  {pictures.length > 0
+                    ? `${pictures.length} image(s) ajoutée(s)`
+                    : ""}
+                </div>
 
                 <label
                   htmlFor="propertyImage1"
@@ -142,302 +442,225 @@ export default function CreatePropertyPage() {
                 name="propertyImages"
                 type="file"
                 accept="image/*"
+                multiple
                 hidden
+                onChange={handlePicturesChange}
               />
 
               <p className={styles.imageField__link}>+ Ajouter une image</p>
+
+              {pictures.length > 0 && (
+                <div className={styles.previewGrid}>
+                  {pictures.map((picture, index) => (
+                    <div
+                      key={`${picture}-${index}`}
+                      className={styles.imageWrapper}
+                    >
+                      <img
+                        key={`${picture}-${index}`}
+                        src={picture}
+                        alt={`Photo du logement ${index + 1}`}
+                        className={styles.imagePreview}
+                      />
+                      <button
+                        type="button"
+                        className={styles.imageDelete}
+                        onClick={() => handleRemovePicture(index)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className={styles.hostCard}>
-            <label htmlFor="host-name" className={styles.imageField__label}>
+            <label htmlFor="hostName" className={styles.imageField__label}>
               Nom de l'hôte
             </label>
-            <input
-              className={styles.createProperty__input}
-              type="text"
-              id="host-name"
-              required
-            />
+            <p className={styles.createProperty__hostname}>
+              {currentUser.name ?? ""}
+            </p>
+            <label htmlFor="profileImage" className={styles.imageField__label}>
+              Photo de profil
+            </label>
 
-            <div className={styles.imageBlock}>
-              <label htmlFor="hostImage1" className={styles.imageField__label}>
-                Photo de profil
-              </label>
-
-              <div className={styles.imageField__row}>
-                <div className={styles.imageField__fakeInput}></div>
-
-                <label
-                  htmlFor="hostImage1"
-                  className={styles.imageField__button}
-                >
-                  +
-                </label>
+            <div className={styles.imageField__row}>
+              <div className={styles.imageField__fakeInput}>
+                {currentUser.picture ? "Image ajoutée" : "Aucune image"}
               </div>
 
-              <input
-                id="hostImage1"
-                name="hostImage1"
-                type="file"
-                accept="image/*"
-                hidden
-              />
-
-              <p className={styles.imageField__link}>+ Ajouter une image</p>
+              <label
+                htmlFor="profileImage"
+                className={styles.imageField__button}
+              >
+                +
+              </label>
             </div>
+
+            <input
+              id="profileImage"
+              name="profileImage"
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleProfilePictureChange}
+            />
+
+            <p className={styles.imageField__link}>+ Ajouter une image</p>
+
+            {pictureToDisplay && (
+              <div className={styles.imageWrapper}>
+                <img
+                  src={`http://localhost:3000${pictureToDisplay}`}
+                  alt="Photo de profil"
+                  className={styles.imagePreview}
+                />
+                <button
+                  type="button"
+                  className={styles.imageDelete}
+                  onClick={handleRemoveProfilePicture}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
         </div>
+
         <div className={styles.property__equipments}>
           <h2 className={styles.property__equipments__title}>Equipements</h2>
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Micro-Ondes</span>
-          </label>
 
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Douche italienne</span>
-          </label>
+          {possibleEquipments.map((equipment) => (
+            <label key={equipment} className={styles.property__equipments_item}>
+              <input
+                type="checkbox"
+                name="equipments"
+                checked={form.equipments.includes(equipment)}
+                onChange={(event) =>
+                  setForm((prev) => {
+                    const checked = event.target.checked;
 
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Frigo</span>
-          </label>
+                    const currentEquipments = prev.equipments ?? [];
 
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>WIFI</span>
-          </label>
+                    const newEquipments = checked
+                      ? [...currentEquipments, equipment]
+                      : currentEquipments.filter((e) => e !== equipment);
 
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Parking</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Sèche Cheveux</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Machine à laver</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Cuisine équipée</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Télévision</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Chambre Séparée</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Climatisation</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Frigo Américain</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Clic-clac</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Four</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Rangements</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Lit</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Bouilloire</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>SDB</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Toilettes sèches</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Cintres</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Baie vitrée</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Hotte</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Baignoire</span>
-          </label>
-
-          <label
-            htmlFor="Equipments"
-            className={styles.property__equipments_item}
-          >
-            <input type="checkbox" name="equipments" />
-            <span>Vue Parc</span>
-          </label>
+                    return {
+                      ...prev,
+                      equipments: newEquipments,
+                    };
+                  })
+                }
+              />
+              <span>{equipment}</span>
+            </label>
+          ))}
         </div>
+
         <div className={styles.property__category}>
           <h2 className={styles.property__category__title}>Catégories</h2>
-          <div className={styles.property__category__buttons}>
-            <button type="button" className={styles.property__category__chip}>
-              Parc
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Night Life
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Culture
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Nature
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Touristique
-            </button>
 
-            <button type="button" className={styles.property__category__chip}>
-              Vue sur mer
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Pour les couples
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Famille
-            </button>
-            <button type="button" className={styles.property__category__chip}>
-              Forêt
-            </button>
+          <div className={styles.property__category__buttons}>
+            {allCategories.map((category) => {
+              const isSelected = tags.includes(category);
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() =>
+                    setForm((prev) => {
+                      const currentTags = prev.tags ?? [];
+
+                      const newTags = currentTags.includes(category)
+                        ? currentTags.filter((t) => t !== category)
+                        : [...currentTags, category];
+
+                      return {
+                        ...prev,
+                        tags: newTags,
+                      };
+                    })
+                  }
+                  className={`${styles.property__category__chip} ${
+                    isSelected ? styles.selected : ""
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
+
           <div className={styles.custom__category}>
             <h2 className={styles.custom__category__title}>
               Ajouter une catégorie personnalisée
             </h2>
+
             <input
               type="text"
               className={styles.custom__category__input}
               placeholder="Nouveau tag"
               aria-label="Nouveau tag"
+              value={customTag}
+              onChange={(e) => setCustomTag(e.target.value)}
             />
 
-            <label
-              htmlFor="categoryImage"
+            <button
+              type="button"
               className={styles.imageField__button}
+              onClick={() => {
+                if (!customTag.trim()) return;
+
+                setForm((prev) => {
+                  const currentTags = prev.tags ?? [];
+
+                  // éviter les doublons
+                  if (currentTags.includes(customTag)) return prev;
+
+                  return {
+                    ...prev,
+                    tags: [...currentTags, customTag],
+                  };
+                });
+
+                setCustomTag(""); // reset input
+              }}
             >
               +
-            </label>
+            </button>
 
-            <button type="button" className={styles.custom__category__link}>
+            <button
+              type="button"
+              className={styles.custom__category__link}
+              onClick={() => {
+                if (!customTag.trim()) return;
+
+                setForm((prev) => {
+                  const currentTags = prev.tags ?? [];
+
+                  if (currentTags.includes(customTag)) return prev;
+
+                  return {
+                    ...prev,
+                    tags: [...currentTags, customTag],
+                  };
+                });
+
+                setCustomTag("");
+              }}
+            >
               + Ajouter un tag
             </button>
           </div>
         </div>
-      </div>
+
+        {error && <p className={styles.error}>{error}</p>}
+      </form>
     </div>
   );
 }

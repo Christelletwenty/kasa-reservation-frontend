@@ -32,8 +32,14 @@ export async function apiFetch<T>(
   const url = `${BACKEND_URL}${path}`;
   // Création de l'objet Headers à partir des options existantes
   const headers = new Headers(options.headers);
+
+  const isFormData = options.body instanceof FormData;
+
   // On force le Content-Type en JSON car notre API communique en JSON
-  headers.set("Content-Type", "application/json");
+  // Seulement si c'est pas deja du formData, pour l'upload d'img
+  if (!isFormData) {
+    headers.set("Content-Type", "application/json");
+  }
 
   /**
    * Si l'option auth est activée, on ajoute automatiquement le token

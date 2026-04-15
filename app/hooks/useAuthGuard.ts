@@ -25,13 +25,7 @@ export function useAuthGuard(): UseAuthGuardResult {
       const tokenUserId = getUserIdFromToken();
       const userId = storedUserId ?? tokenUserId;
 
-      console.log("token:", token);
-      console.log("storedUserId:", storedUserId);
-      console.log("tokenUserId:", tokenUserId);
-      console.log("final userId:", userId);
-
       if (!token) {
-        console.log("Pas de token");
         setUser(null);
         setIsLoading(false);
         router.replace("/login");
@@ -39,7 +33,6 @@ export function useAuthGuard(): UseAuthGuardResult {
       }
 
       if (!userId) {
-        console.log("Pas de userId");
         clearToken();
         setUser(null);
         setIsLoading(false);
@@ -48,12 +41,9 @@ export function useAuthGuard(): UseAuthGuardResult {
       }
 
       try {
-        console.log("Appel getUserById avec:", userId);
         const currentUser = await getUserById(userId);
-        console.log("currentUser:", currentUser);
         setUser(currentUser);
       } catch (error) {
-        console.error("Erreur getUserById:", error);
         setUser(null);
         setIsLoading(false);
         router.replace("/login");
