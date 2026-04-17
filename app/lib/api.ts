@@ -86,6 +86,16 @@ export async function apiFetch<T>(
     // On lance une erreur personnalisée contenant le status HTTP
     throw new HttpError(res.status, message);
   }
+
+  if (res.status === 204) {
+    return undefined as T; // No Content, on retourne undefined
+  }
+
+  const contentType = res.headers.get("Content-Type");
+
+  if (!contentType || !contentType.includes("application/json")) {
+    return undefined as T; // Si la réponse n'est pas du JSON, on retourne undefined
+  }
   /**
    * Si tout se passe bien, on retourne le JSON de la réponse.
    * Le résultat est typé avec le type générique T.

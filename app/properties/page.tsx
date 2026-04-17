@@ -12,6 +12,8 @@ export default function PropertiesPage() {
   const [favProperties, setFavProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const currentUserId = getStoredUserId();
+  const isLoggedIn = currentUserId !== null;
 
   // effect avec un call pour appeler l'API
   useEffect(() => {
@@ -57,6 +59,9 @@ export default function PropertiesPage() {
       <div className={styles.properties__cards}>
         {properties.map((p) => (
           <PropertyCard
+            canFavorite={isLoggedIn}
+            canEdit={currentUserId === p.host.id}
+            canDelete={currentUserId === p.host.id}
             key={p.id}
             property={p}
             favorites={favProperties.some((fav) => fav.id === p.id)}
@@ -68,6 +73,12 @@ export default function PropertiesPage() {
                   prev.filter((fav) => fav.id !== p.id),
                 );
               }
+            }}
+            onDelete={() => {
+              setProperties((prev) =>
+                prev.filter((property) => property.id !== p.id),
+              );
+              setFavProperties((prev) => prev.filter((fav) => fav.id !== p.id));
             }}
           />
         ))}

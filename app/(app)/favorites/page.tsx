@@ -10,6 +10,7 @@ export default function FavoritesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const currentUserId = getStoredUserId();
 
   useEffect(() => {
     (async () => {
@@ -52,6 +53,9 @@ export default function FavoritesPage() {
         <div className={styles.properties__cards}>
           {properties.map((p) => (
             <PropertyCard
+              canFavorite={true}
+              canEdit={currentUserId === p.host.id}
+              canDelete={currentUserId === p.host.id}
               key={p.id}
               property={p}
               favorites={true}
