@@ -137,6 +137,8 @@
 
 .properties__contactHost,
 .properties__sendMessage {
+  text-align: center;
+  line-height: 36px;
   width: 100%;
   border: none;
   border-radius: 12px;

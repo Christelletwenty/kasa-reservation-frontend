@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Property } from "@/app/types/properties";
 import { useParams, useRouter } from "next/navigation";
 import { BACKEND_URL } from "@/app/lib/config";
+import Link from "next/link";
+import { getStoredUserId } from "@/app/lib/auth-guard";
 
 export default function PropertyDetailPage() {
   const router = useRouter();
@@ -15,6 +17,8 @@ export default function PropertyDetailPage() {
   const [error, setError] = useState("");
 
   const id = params.id as string;
+  const currentUserId = getStoredUserId();
+  const isLoggedIn = currentUserId !== null;
 
   useEffect(() => {
     if (!id) {
@@ -173,12 +177,22 @@ export default function PropertyDetailPage() {
             </p>
           </div>
           <div className={styles.properties__detailHostActions}>
-            <button className={styles.properties__contactHost}>
+            <Link
+              className={styles.properties__contactHost}
+              href={
+                isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
+              }
+            >
               Contacter l'hôte
-            </button>
-            <button className={styles.properties__sendMessage}>
+            </Link>
+            <Link
+              className={styles.properties__sendMessage}
+              href={
+                isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
+              }
+            >
               Envoyer un message
-            </button>
+            </Link>
           </div>
         </div>
       </div>

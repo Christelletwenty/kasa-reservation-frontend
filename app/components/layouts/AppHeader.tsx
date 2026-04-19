@@ -21,6 +21,7 @@ export default function AppHeader() {
         <div className={styles.headerLeft}>
           <Link href="/properties">Accueil</Link>
           <Link href="/about">À propos</Link>
+          <Link href="/profile">Mon profil</Link>
         </div>
         <div className={styles.headerCenter}>
           <Link href="/properties">

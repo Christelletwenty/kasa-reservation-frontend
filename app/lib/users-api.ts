@@ -32,3 +32,17 @@ export function updateUserById(id: number, user: Partial<User>): Promise<User> {
     body: JSON.stringify(user),
   });
 }
+
+export function requestPasswordReset(email: string): Promise<void> {
+  return apiFetch<void>("/auth/request-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function resetPassword(token: string, password: string): Promise<void> {
+  return apiFetch<void>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
