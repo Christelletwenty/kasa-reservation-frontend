@@ -2,13 +2,16 @@
 
 import { getStoredUserId } from "@/app/lib/auth-guard";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getUserById } from "../../lib/users-api";
 import styles from "./Message.module.css";
 import Link from "next/link";
+import { User } from "@/app/types/users";
+import { BACKEND_URL } from "@/app/lib/config";
 
 type Conversation = {
   id: number;
-  userName: string;
+  userId: number;
   preview: string;
   time: string;
   unread?: boolean;
@@ -25,7 +28,7 @@ type Message = {
 const mockConversations: Conversation[] = [
   {
     id: 1,
-    userName: "Utilisateur",
+    userId: 3,
     preview:
       "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
     time: "11:04 am",
@@ -33,7 +36,7 @@ const mockConversations: Conversation[] = [
   },
   {
     id: 2,
-    userName: "Utilisateur",
+    userId: 1,
     preview:
       "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
     time: "11:04 am",
@@ -41,42 +44,14 @@ const mockConversations: Conversation[] = [
   },
   {
     id: 3,
-    userName: "Utilisateur",
+    userId: 5,
     preview:
       "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
     time: "11:04 am",
   },
   {
     id: 4,
-    userName: "Utilisateur",
-    preview:
-      "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
-    time: "11:04 am",
-  },
-  {
-    id: 5,
-    userName: "Utilisateur",
-    preview:
-      "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
-    time: "11:04 am",
-  },
-  {
-    id: 6,
-    userName: "Utilisateur",
-    preview:
-      "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
-    time: "11:04 am",
-  },
-  {
-    id: 7,
-    userName: "Utilisateur",
-    preview:
-      "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
-    time: "11:04 am",
-  },
-  {
-    id: 8,
-    userName: "Utilisateur",
+    userId: 2,
     preview:
       "Bonjour, votre appartement est-il disponible pour le week-end du 12 au 14 octobre ?",
     time: "11:04 am",
@@ -134,18 +109,107 @@ export default function MessagesPage() {
   const hostId = searchParams.get("hostId");
   const currentUserId = getStoredUserId();
   const isLoggedIn = currentUserId !== null;
+  const [usersById, setUsersById] = useState<Record<number, User>>({});
+  const messagesBodyRef = useRef<HTMLDivElement | null>(null);
+  const [messagesByConversation, setMessagesByConversation] = useState<
+    Record<number, Message[]>
+  >(mockMessagesByConversation);
 
   const selectedConversation = mockConversations.find(
     (conversation) => conversation.id === selectedConversationId,
   );
 
-  const messages = mockMessagesByConversation[selectedConversationId] ?? [];
+  const messages = messagesByConversation[selectedConversationId] ?? [];
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      const uniqueUserIds = [
+        ...new Set(
+          mockConversations.map((conversation) => conversation.userId),
+        ),
+      ];
+
+      if (currentUserId) {
+        uniqueUserIds.push(currentUserId);
+      }
+
+      const missingUserIds = uniqueUserIds.filter((id) => !usersById[id]);
+
+      if (missingUserIds.length === 0) {
+        return;
+      }
+
+      const users = await Promise.all(
+        missingUserIds.map((id) => getUserById(id)),
+      );
+
+      setUsersById((previous) => {
+        const next = { ...previous };
+
+        for (const user of users) {
+          next[user.id] = user;
+        }
+
+        return next;
+      });
+    };
+
+    void loadUsers();
+  }, [usersById, currentUserId]);
+
+  useEffect(() => {
+    if (messagesBodyRef.current) {
+      messagesBodyRef.current.scrollTop = messagesBodyRef.current.scrollHeight;
+    }
+  }, [selectedConversationId, messages]);
 
   useEffect(() => {
     if (!isLoggedIn) {
       router.push("/login");
     }
   }, [isLoggedIn, router]);
+
+  function sendMessage() {
+    const trimmedMessage = message.trim();
+
+    if (!trimmedMessage) {
+      return;
+    }
+
+    const newMessage: Message = {
+      id: Date.now(),
+      sender: "me",
+      text: trimmedMessage,
+      time: "À l'instant",
+    };
+
+    setMessagesByConversation((previous) => ({
+      ...previous,
+      [selectedConversationId]: [
+        ...(previous[selectedConversationId] ?? []),
+        newMessage,
+      ],
+    }));
+
+    setMessage("");
+
+    setTimeout(() => {
+      const replyMessage: Message = {
+        id: Date.now() + 1,
+        sender: "other",
+        text: "Oui !",
+        time: "À l'instant",
+      };
+
+      setMessagesByConversation((previous) => ({
+        ...previous,
+        [selectedConversationId]: [
+          ...(previous[selectedConversationId] ?? []),
+          replyMessage,
+        ],
+      }));
+    }, 1500);
+  }
 
   if (!isLoggedIn) {
     return <div>Redirection vers la page de connexion...</div>;
@@ -174,12 +238,21 @@ export default function MessagesPage() {
               }`}
               onClick={() => setSelectedConversationId(conversation.id)}
             >
-              <div className={styles.avatarPlaceholder} />
+              <div className={styles.avatarPlaceholder}>
+                {usersById[conversation.userId]?.picture ? (
+                  <img
+                    src={`${usersById[conversation.userId].picture!.startsWith("http") ? "" : BACKEND_URL}${usersById[conversation.userId].picture!}`}
+                    alt=""
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
 
               <div className={styles.conversationContent}>
                 <div className={styles.conversationTopRow}>
                   <h2 className={styles.conversationUserName}>
-                    {conversation.userName}
+                    {usersById[conversation.userId]?.name ?? "Chargement..."}
                   </h2>
                   <span className={styles.conversationTime}>
                     {conversation.time}
@@ -201,7 +274,7 @@ export default function MessagesPage() {
       </section>
 
       <section className={styles.messagesContent}>
-        <div className={styles.messagesBody}>
+        <div ref={messagesBodyRef} className={styles.messagesBody}>
           {selectedConversation ? (
             messages.map((msg, index) => {
               const showDateSeparator =
@@ -229,12 +302,21 @@ export default function MessagesPage() {
                   >
                     {msg.sender === "other" ? (
                       <>
-                        <div className={styles.messageAvatar} />
+                        <div className={styles.messageAvatar}>
+                          {usersById[selectedConversation.userId]?.picture ? (
+                            <img
+                              src={`${usersById[selectedConversation.userId].picture!.startsWith("http") ? "" : BACKEND_URL}${usersById[selectedConversation.userId].picture!}`}
+                              alt=""
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </div>
 
                         <div className={styles.messageContent}>
                           <div className={styles.messageMeta}>
                             <span className={styles.messageAuthor}>
-                              Utilisateur
+                              {usersById[selectedConversation.userId]?.name}
                             </span>
                             <span className={styles.messageDot}>•</span>
                             <span className={styles.messageTime}>
@@ -252,7 +334,7 @@ export default function MessagesPage() {
                         <div className={styles.messageContentMe}>
                           <div className={styles.messageMetaMe}>
                             <span className={styles.messageAuthor}>
-                              Utilisateur
+                              {usersById[currentUserId]?.name}
                             </span>
                             <span className={styles.messageDot}>•</span>
                             <span className={styles.messageTime}>
@@ -265,7 +347,16 @@ export default function MessagesPage() {
                           </div>
                         </div>
 
-                        <div className={styles.messageAvatar} />
+                        <div className={styles.messageAvatar}>
+                          {usersById[currentUserId]?.picture ? (
+                            <img
+                              src={`${usersById[currentUserId].picture!.startsWith("http") ? "" : BACKEND_URL}${usersById[currentUserId].picture!}`}
+                              alt=""
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </div>
                       </>
                     )}
                   </div>
@@ -287,7 +378,11 @@ export default function MessagesPage() {
             onChange={(event) => setMessage(event.target.value)}
           />
 
-          <button type="submit" className={styles.sendButton}>
+          <button
+            type="button"
+            className={styles.sendButton}
+            onClick={() => sendMessage()}
+          >
             ↑
           </button>
         </form>

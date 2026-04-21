@@ -19,6 +19,7 @@ export default function PropertyDetailPage() {
   const id = params.id as string;
   const currentUserId = getStoredUserId();
   const isLoggedIn = currentUserId !== null;
+  const isOwner = String(currentUserId) === String(property?.host.id);
 
   useEffect(() => {
     if (!id) {
@@ -176,24 +177,26 @@ export default function PropertyDetailPage() {
               {property.rating_avg}
             </p>
           </div>
-          <div className={styles.properties__detailHostActions}>
-            <Link
-              className={styles.properties__contactHost}
-              href={
-                isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
-              }
-            >
-              Contacter l'hôte
-            </Link>
-            <Link
-              className={styles.properties__sendMessage}
-              href={
-                isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
-              }
-            >
-              Envoyer un message
-            </Link>
-          </div>
+          {!isOwner && (
+            <div className={styles.properties__detailHostActions}>
+              <Link
+                className={styles.properties__contactHost}
+                href={
+                  isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
+                }
+              >
+                Contacter l'hôte
+              </Link>
+              <Link
+                className={styles.properties__sendMessage}
+                href={
+                  isLoggedIn ? `/messages?hostId=${property.host.id}` : "/login"
+                }
+              >
+                Envoyer un message
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

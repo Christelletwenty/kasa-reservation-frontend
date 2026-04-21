@@ -52,7 +52,6 @@ export default function MyProfilePage() {
         const fetchedUser = await getUserById(Number(currentUserId));
 
         setUser(fetchedUser);
-        console.log(fetchedUser);
         setForm({
           name: fetchedUser.name ?? "",
           picture: fetchedUser.picture ?? null,
@@ -204,13 +203,15 @@ export default function MyProfilePage() {
       <h1 className={styles.profile__title}>Mon compte</h1>
 
       {!isEditing ? (
-        <button
-          type="button"
-          className={styles.modify__profile}
-          onClick={handleStartEdit}
-        >
-          Modifier les informations du profil
-        </button>
+        <div className={styles.profile__actions}>
+          <button
+            type="button"
+            className={styles.modify__profile}
+            onClick={handleStartEdit}
+          >
+            Modifier les informations du profil
+          </button>
+        </div>
       ) : (
         <div className={styles.profile__actions}>
           <button

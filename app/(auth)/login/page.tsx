@@ -37,6 +37,7 @@ export default function LoginPage() {
       setError(error);
     } finally {
       setLoading(false);
+      window.dispatchEvent(new Event("auth-changed"));
     }
   }
 
@@ -81,7 +82,7 @@ export default function LoginPage() {
           >
             {loading ? "Connexion en cours..." : "Se connecter"}
           </button>
-          <a className={styles.login__link} href="#">
+          <a className={styles.login__link} href="/forgot-password">
             Mot de passe oublié
           </a>
         </form>
