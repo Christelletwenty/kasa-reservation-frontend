@@ -4,7 +4,7 @@ import styles from "./LoginPage.module.css";
 import { useRouter } from "next/navigation";
 import { AuthLogin } from "@/app/types/auth";
 import { login } from "@/app/lib/auth-api";
-import { saveAuth, setToken } from "@/app/lib/auth";
+import { saveAuth } from "@/app/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,9 +32,15 @@ export default function LoginPage() {
       router.replace("/properties");
       router.refresh();
     } catch (err) {
-      const error =
-        err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(error);
+      let message = "Une erreur est survenue";
+      if (err instanceof Error) {
+        if (err.message.toLowerCase() === "invalid credentials") {
+          message = "Email ou mot de passe incorrect";
+        } else {
+          message = err.message;
+        }
+      }
+      setError(message);
     } finally {
       setLoading(false);
       window.dispatchEvent(new Event("auth-changed"));

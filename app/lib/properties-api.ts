@@ -4,7 +4,7 @@ import { apiFetch } from "./api";
 export function getProperties(): Promise<Property[]> {
   return apiFetch<Property[]>("/api/properties", {
     method: "GET",
-    auth: true,
+    auth: false,
   });
 }
 
@@ -19,7 +19,7 @@ export function createProperty(createPropertyPayload: CreateProperty) {
 export function getPropertyById(id: string): Promise<Property> {
   return apiFetch<Property>(`/api/properties/${id}`, {
     method: "GET",
-    auth: true,
+    auth: false,
   });
 }
 

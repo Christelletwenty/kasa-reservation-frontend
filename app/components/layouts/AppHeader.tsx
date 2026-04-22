@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import styles from "./AppHeader.module.css";
 import { useRouter } from "next/navigation";
 import { clearToken } from "@/app/lib/auth";

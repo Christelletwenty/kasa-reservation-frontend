@@ -8,12 +8,10 @@ import { BACKEND_URL } from "@/app/lib/config";
 import { getUserById, updateUserById } from "@/app/lib/users-api";
 import { uploadImage } from "@/app/lib/upload-api";
 
-type EditableRole = "client" | "owner" | "admin";
-
 type FormState = {
   name: string;
   picture: string | null;
-  role: EditableRole;
+  role: string;
 };
 
 export default function MyProfilePage() {
@@ -23,7 +21,7 @@ export default function MyProfilePage() {
   const [form, setForm] = useState<FormState>({
     name: "",
     picture: null,
-    role: "client",
+    role: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -55,7 +53,7 @@ export default function MyProfilePage() {
         setForm({
           name: fetchedUser.name ?? "",
           picture: fetchedUser.picture ?? null,
-          role: fetchedUser.role,
+          role: fetchedUser.role ?? "",
         });
 
         setPicturePreview(fetchedUser.picture ?? null);
@@ -79,7 +77,7 @@ export default function MyProfilePage() {
     setForm({
       name: currentUser.name ?? "",
       picture: currentUser.picture ?? null,
-      role: currentUser.role,
+      role: currentUser.role ?? "",
     });
 
     setPicturePreview(currentUser.picture ?? null);
@@ -112,7 +110,7 @@ export default function MyProfilePage() {
     setIsEditing(false);
   };
 
-  const handleInputChange = (field: "name" | "email", value: string) => {
+  const handleInputChange = (field: "name", value: string) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
@@ -139,15 +137,6 @@ export default function MyProfilePage() {
     }));
   };
 
-  const canToggleRole = form.role === "client" || form.role === "owner";
-
-  const handleRoleToggle = () => {
-    setForm((prev) => ({
-      ...prev,
-      role: prev.role === "client" ? "owner" : "client",
-    }));
-  };
-
   const handleSave = async () => {
     if (!currentUserId || !user) {
       setError("Utilisateur introuvable.");
@@ -171,7 +160,6 @@ export default function MyProfilePage() {
       const updatedUser = await updateUserById(Number(currentUserId), {
         name: form.name.trim(),
         picture: nextPicture,
-        role: form.role,
       });
 
       setUser(updatedUser);
@@ -299,34 +287,14 @@ export default function MyProfilePage() {
               onChange={(e) => handleInputChange("name", e.target.value)}
             />
           </label>
-
-          <label className={styles.label} htmlFor="role-toggle">
+          <label className={styles.label}>
             Rôle
-            {form.role === "admin" ? (
-              <input
-                className={styles.input}
-                type="text"
-                value="Admin"
-                readOnly
-              />
-            ) : (
-              <div className={styles.roleSwitchRow}>
-                <span>Client</span>
-                <input
-                  id="role-toggle"
-                  type="checkbox"
-                  checked={form.role === "owner"}
-                  disabled={!isEditing}
-                  onChange={() =>
-                    setForm((prev) => ({
-                      ...prev,
-                      role: prev.role === "client" ? "owner" : "client",
-                    }))
-                  }
-                />
-                <span>Owner</span>
-              </div>
-            )}
+            <input
+              className={styles.input}
+              type="text"
+              value={form.role}
+              readOnly
+            />
           </label>
         </form>
       </div>

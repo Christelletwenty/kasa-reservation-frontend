@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Property } from "../types/properties";
 import PropertyCard from "./components/PropertyCard";
@@ -10,34 +11,44 @@ import { getStoredUserId } from "../lib/auth-guard";
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [favProperties, setFavProperties] = useState<Property[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const currentUserId = getStoredUserId();
+
   const isLoggedIn = currentUserId !== null;
 
-  // effect avec un call pour appeler l'API
   useEffect(() => {
+    const userId = getStoredUserId();
+    setCurrentUserId(userId);
+
     (async () => {
       try {
         setLoading(true);
         setError("");
 
-        const [propertieResponse, favoritesResponse] = await Promise.all([
-          getProperties(),
-          getFavoritesUsers(getStoredUserId()!),
-        ]);
-        setProperties(propertieResponse);
-        setFavProperties(favoritesResponse);
+        const propertiesResponse = await getProperties();
+        setProperties(propertiesResponse);
+
+        if (userId !== null) {
+          const favoritesResponse = await getFavoritesUsers(userId);
+          setFavProperties(favoritesResponse);
+        } else {
+          setFavProperties([]);
+        }
       } catch (err) {
         setError("Erreur lors du chargement des propriétés");
       } finally {
         setLoading(false);
       }
     })();
-  }, []); //call qu'une fois au chargement de la page
+  }, []);
 
   if (loading) {
     return <div>Chargement...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
@@ -56,14 +67,15 @@ export default function PropertiesPage() {
           className={styles.properties__image}
         />
       </div>
+
       <div className={styles.properties__cards}>
         {properties.map((p) => (
           <PropertyCard
+            key={p.id}
+            property={p}
             canFavorite={isLoggedIn}
             canEdit={currentUserId === p.host.id}
             canDelete={currentUserId === p.host.id}
-            key={p.id}
-            property={p}
             favorites={favProperties.some((fav) => fav.id === p.id)}
             favoriteChanged={(fav) => {
               if (fav) {
@@ -83,6 +95,7 @@ export default function PropertiesPage() {
           />
         ))}
       </div>
+
       <div className={styles.properties__howItWorks}>
         <h2 className={styles.properties__howItWorksTitle}>
           Comment ça marche ?
@@ -92,6 +105,7 @@ export default function PropertiesPage() {
           ou un voyage professionnel, Kasa vous aide à trouver un lieu qui vous
           ressemble.
         </p>
+
         <div className={styles.properties__howItWorksSteps}>
           <div className={styles.properties__howItWorksStep}>
             <h3 className={styles.properties__howItWorksStepTitle}>
@@ -101,6 +115,7 @@ export default function PropertiesPage() {
               Entrez votre destination, vos dates et laissez Kasa faire le reste
             </p>
           </div>
+
           <div className={styles.properties__howItWorksStep}>
             <h3 className={styles.properties__howItWorksStepTitle}>Réservez</h3>
             <p className={styles.properties__howItWorksStepDescription}>
@@ -108,6 +123,7 @@ export default function PropertiesPage() {
               vérifiés.
             </p>
           </div>
+
           <div className={styles.properties__howItWorksStep}>
             <h3 className={styles.properties__howItWorksStepTitle}>
               Vivez l’expérience

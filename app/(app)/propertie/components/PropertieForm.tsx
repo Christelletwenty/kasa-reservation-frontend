@@ -24,6 +24,7 @@ export default function PropertieForm({
   const [customTag, setCustomTag] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const isEditMode = Boolean(property);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -234,7 +235,10 @@ export default function PropertieForm({
   return (
     <div className={styles.createProperty__page}>
       <form
-        onSubmit={() => onSubmit(form)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(form);
+        }}
         className={styles.createproperty__container}
       >
         <div className={styles.createProperty__page__actions}>
@@ -526,134 +530,141 @@ export default function PropertieForm({
           </div>
         </div>
 
-        <div className={styles.property__equipments}>
-          <h2 className={styles.property__equipments__title}>Equipements</h2>
+        {!isEditMode && (
+          <div className={styles.property__equipments}>
+            <h2 className={styles.property__equipments__title}>Equipements</h2>
 
-          {possibleEquipments.map((equipment) => (
-            <label key={equipment} className={styles.property__equipments_item}>
-              <input
-                type="checkbox"
-                name="equipments"
-                checked={form.equipments.includes(equipment)}
-                onChange={(event) =>
-                  setForm((prev) => {
-                    const checked = event.target.checked;
-
-                    const currentEquipments = prev.equipments ?? [];
-
-                    const newEquipments = checked
-                      ? [...currentEquipments, equipment]
-                      : currentEquipments.filter((e) => e !== equipment);
-
-                    return {
-                      ...prev,
-                      equipments: newEquipments,
-                    };
-                  })
-                }
-              />
-              <span>{equipment}</span>
-            </label>
-          ))}
-        </div>
-
-        <div className={styles.property__category}>
-          <h2 className={styles.property__category__title}>Catégories</h2>
-
-          <div className={styles.property__category__buttons}>
-            {allCategories.map((category) => {
-              const isSelected = tags.includes(category);
-
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() =>
+            {possibleEquipments.map((equipment) => (
+              <label
+                key={equipment}
+                className={styles.property__equipments_item}
+              >
+                <input
+                  type="checkbox"
+                  name="equipments"
+                  checked={form.equipments.includes(equipment)}
+                  onChange={(event) =>
                     setForm((prev) => {
-                      const currentTags = prev.tags ?? [];
+                      const checked = event.target.checked;
 
-                      const newTags = currentTags.includes(category)
-                        ? currentTags.filter((t) => t !== category)
-                        : [...currentTags, category];
+                      const currentEquipments = prev.equipments ?? [];
+
+                      const newEquipments = checked
+                        ? [...currentEquipments, equipment]
+                        : currentEquipments.filter((e) => e !== equipment);
 
                       return {
                         ...prev,
-                        tags: newTags,
+                        equipments: newEquipments,
                       };
                     })
                   }
-                  className={`${styles.property__category__chip} ${
-                    isSelected ? styles.selected : ""
-                  }`}
-                >
-                  {category}
-                </button>
-              );
-            })}
+                />
+                <span>{equipment}</span>
+              </label>
+            ))}
           </div>
+        )}
 
-          <div className={styles.custom__category}>
-            <h2 className={styles.custom__category__title}>
-              Ajouter une catégorie personnalisée
-            </h2>
+        {!isEditMode && (
+          <div className={styles.property__category}>
+            <h2 className={styles.property__category__title}>Catégories</h2>
 
-            <input
-              type="text"
-              className={styles.custom__category__input}
-              placeholder="Nouveau tag"
-              aria-label="Nouveau tag"
-              value={customTag}
-              onChange={(e) => setCustomTag(e.target.value)}
-            />
+            <div className={styles.property__category__buttons}>
+              {allCategories.map((category) => {
+                const isSelected = tags.includes(category);
 
-            <button
-              type="button"
-              className={styles.imageField__button}
-              onClick={() => {
-                if (!customTag.trim()) return;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() =>
+                      setForm((prev) => {
+                        const currentTags = prev.tags ?? [];
 
-                setForm((prev) => {
-                  const currentTags = prev.tags ?? [];
+                        const newTags = currentTags.includes(category)
+                          ? currentTags.filter((t) => t !== category)
+                          : [...currentTags, category];
 
-                  // éviter les doublons
-                  if (currentTags.includes(customTag)) return prev;
+                        return {
+                          ...prev,
+                          tags: newTags,
+                        };
+                      })
+                    }
+                    className={`${styles.property__category__chip} ${
+                      isSelected ? styles.selected : ""
+                    }`}
+                  >
+                    {category}
+                  </button>
+                );
+              })}
+            </div>
 
-                  return {
-                    ...prev,
-                    tags: [...currentTags, customTag],
-                  };
-                });
+            <div className={styles.custom__category}>
+              <h2 className={styles.custom__category__title}>
+                Ajouter une catégorie personnalisée
+              </h2>
 
-                setCustomTag(""); // reset input
-              }}
-            >
-              +
-            </button>
+              <input
+                type="text"
+                className={styles.custom__category__input}
+                placeholder="Nouveau tag"
+                aria-label="Nouveau tag"
+                value={customTag}
+                onChange={(e) => setCustomTag(e.target.value)}
+              />
 
-            <button
-              type="button"
-              className={styles.custom__category__link}
-              onClick={() => {
-                if (!customTag.trim()) return;
+              <button
+                type="button"
+                className={styles.imageField__button}
+                onClick={() => {
+                  if (!customTag.trim()) return;
 
-                setForm((prev) => {
-                  const currentTags = prev.tags ?? [];
+                  setForm((prev) => {
+                    const currentTags = prev.tags ?? [];
 
-                  if (currentTags.includes(customTag)) return prev;
+                    // éviter les doublons
+                    if (currentTags.includes(customTag)) return prev;
 
-                  return {
-                    ...prev,
-                    tags: [...currentTags, customTag],
-                  };
-                });
+                    return {
+                      ...prev,
+                      tags: [...currentTags, customTag],
+                    };
+                  });
 
-                setCustomTag("");
-              }}
-            >
-              + Ajouter un tag
-            </button>
+                  setCustomTag(""); // reset input
+                }}
+              >
+                +
+              </button>
+
+              <button
+                type="button"
+                className={styles.custom__category__link}
+                onClick={() => {
+                  if (!customTag.trim()) return;
+
+                  setForm((prev) => {
+                    const currentTags = prev.tags ?? [];
+
+                    if (currentTags.includes(customTag)) return prev;
+
+                    return {
+                      ...prev,
+                      tags: [...currentTags, customTag],
+                    };
+                  });
+
+                  setCustomTag("");
+                }}
+              >
+                + Ajouter un tag
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {error && <p className={styles.error}>{error}</p>}
       </form>

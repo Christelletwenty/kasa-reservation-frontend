@@ -1,6 +1,6 @@
 import type { User } from "../types/users";
 import { getToken } from "./auth";
-import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from "./config";
+import { USER_STORAGE_KEY } from "./config";
 
 type JwtPayload = {
   id?: number | string;

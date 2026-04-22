@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthGuard } from "@/app/hooks/useAuthGuard";
 import { createProperty } from "@/app/lib/properties-api";
-import { uploadImage } from "@/app/lib/upload-api";
 import { CreateProperty } from "@/app/types/properties";
-import { BACKEND_URL } from "@/app/lib/config";
-import { updateUserById } from "@/app/lib/users-api";
 import PropertieForm from "./components/PropertieForm";
 
 export default function CreatePropertyPage() {

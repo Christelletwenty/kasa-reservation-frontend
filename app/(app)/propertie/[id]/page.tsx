@@ -4,8 +4,8 @@ import { useAuthGuard } from "@/app/hooks/useAuthGuard";
 import PropertieForm from "../components/PropertieForm";
 import { CreateProperty, Property } from "@/app/types/properties";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { getPropertyById } from "@/app/lib/properties-api";
+import { useParams, useRouter } from "next/navigation";
+import { getPropertyById, updateProperty } from "@/app/lib/properties-api";
 import { User } from "@/app/types/users";
 
 export default function UpdatePropertyPage() {
@@ -14,6 +14,7 @@ export default function UpdatePropertyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [property, setProperty] = useState<Property | null>(null);
+  const router = useRouter();
 
   const id = params.id as string;
 
@@ -39,8 +40,28 @@ export default function UpdatePropertyPage() {
     fetchProperty();
   }, [id]);
 
-  function handleSubmit(form: CreateProperty) {
-    console.log(form);
+  async function handleSubmit(form: CreateProperty) {
+    try {
+      setLoading(true);
+      setError("");
+
+      const updatedProperty = await updateProperty({
+        id,
+        ...form,
+      });
+
+      setProperty(updatedProperty);
+      router.push("/properties");
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la mise à jour du logement";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (authLoading || loading) {
@@ -58,7 +79,7 @@ export default function UpdatePropertyPage() {
   return (
     <PropertieForm
       property={property}
-      currentUser={property.host as User}
+      currentUser={currentUser}
       onSubmit={handleSubmit}
     />
   );

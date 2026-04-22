@@ -5,6 +5,7 @@ import { AuthRegister } from "@/app/types/auth";
 import { useState } from "react";
 import { register } from "@/app/lib/auth-api";
 import { setToken } from "@/app/lib/auth";
+import { USER_STORAGE_KEY } from "@/app/lib/config";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    role: "client",
+    role: "owner",
   });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -30,6 +31,10 @@ export default function RegisterPage() {
       }
 
       setToken(registerResponse.token);
+      sessionStorage.setItem(
+        USER_STORAGE_KEY,
+        JSON.stringify(registerResponse.user),
+      );
       router.replace("/properties");
       router.refresh();
       return;
@@ -66,7 +71,7 @@ export default function RegisterPage() {
           <label className={styles.register__label} htmlFor="prenom">
             Prénom
           </label>
-          <input className={styles.register__input} type="prenom" id="prenom" />
+          <input className={styles.register__input} type="text" id="prenom" />
           <label htmlFor="email" className={styles.register__label}>
             Adresse email
           </label>
