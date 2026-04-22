@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
 
       setSuccess(response.message || "Demande envoyée avec succès.");
 
-      // comme ton backend renvoie le token, on redirige directement
+      // Le backend renvoie pas d'email, donc on redirige directement vers le lien.
       router.push(
         `/reset-password?token=${encodeURIComponent(response.token)}`,
       );

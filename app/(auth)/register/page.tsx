@@ -44,6 +44,7 @@ export default function RegisterPage() {
       setError(error);
     } finally {
       setLoading(false);
+      window.dispatchEvent(new Event("auth-changed"));
     }
   }
 

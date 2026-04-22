@@ -38,4 +38,5 @@ export interface ResetPassword {
 
 export interface ResetPasswordResponse {
   ok: boolean;
+  error?: string;
 }
