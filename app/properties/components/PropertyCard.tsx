@@ -40,16 +40,20 @@ export default function PropertyCard({
   }, [favorites]);
 
   const handleFavorite = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // Empêche la propagation du clic pour éviter de déclencher la navigation vers les détails de la propriété
+    // Empêche le clic de remonter jusqu’à la carte
+    // Sans ça, cliquer sur le cœur redirigerait vers la page détail
+    e.stopPropagation();
     try {
       setIsLoading(true);
       setError(null);
 
+      // Si la propriété est déjà en favori, on la retire
       if (isFavorite) {
         await deletePropertiesFromFavorites(property.id);
         setIsFavorite(false);
         favoriteChanged(false);
       } else {
+        // Sinon, on ajoute la propriété aux favoris
         await addPropertiesToFavorites(property.id);
         setIsFavorite(true);
         favoriteChanged(true);
@@ -57,30 +61,40 @@ export default function PropertyCard({
     } catch (err) {
       setError("Erreur lors de l'ajout aux favoris");
     } finally {
+      // finally est toujours exécuté, succès ou erreur
+      // On réactive donc le bouton
       setIsLoading(false);
     }
   };
 
+  // Redirige vers la page détail de la propriété
   const handleNavToDetail = () => {
     router.push(`/properties/${property.id}`);
   };
 
+  // Ouvre la modal de suppression
   const handleOpenDeleteModal = (
     e: React.MouseEvent<HTMLButtonElement>,
   ): void => {
+    // Empêche la navigation vers le détail quand on clique sur supprimer
     e.stopPropagation();
     setDeleteModal(true);
   };
 
+  // Ferme la modal de suppression
   const handleCloseDeleteModal = (
     e?: React.MouseEvent<HTMLButtonElement>,
   ): void => {
+    // Le ? permet d’appeler stopPropagation uniquement si e existe
     e?.stopPropagation();
     setDeleteModal(false);
   };
 
+  // Fonction appelée quand la suppression a bien été confirmée dans la modal
   const handleDeleteSuccess = (): void => {
     setDeleteModal(false);
+    // On prévient le parent qu’une propriété a été supprimée
+    // Le ?. évite une erreur si onDelete n’a pas été fourni
     onDelete?.();
   };
 

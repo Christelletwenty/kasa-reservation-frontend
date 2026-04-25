@@ -18,9 +18,11 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      //J'appelle mon api avec les données du formulaire
+      //On appelle l'api avec les données du formulaire
       const loginResponse = await login(form);
-      //S'il a pas de token ou de user je renvoie une erreur
+
+      // On vérifie que la réponse contient bien un token et un utilisateur.
+      // Sans ces deux informations, la connexion n'est pas considérée comme valide.
       if (!loginResponse.token || !loginResponse.user) {
         setError(
           loginResponse.error || "Une erreur est survenue lors de la connexion",
@@ -28,8 +30,13 @@ export default function LoginPage() {
         return;
       }
 
+      // Si la connexion est valide, on sauvegarde les données d'authentification.
+      // Cela permet de garder l'utilisateur connecté sur les prochaines pages.
       saveAuth(loginResponse);
+      // On redirige l'utilisateur vers la page des propriétés.
+      // replace évite que la page de login reste dans l'historique de navigation.
       router.replace("/properties");
+      // On force Next.js à rafraîchir les données côté serveur/client.
       router.refresh();
     } catch (err) {
       let message = "Une erreur est survenue";
@@ -43,6 +50,9 @@ export default function LoginPage() {
       setError(message);
     } finally {
       setLoading(false);
+      // On déclenche un événement global personnalisé.
+      // Cela peut permettre à d'autres composants de l'application
+      // de savoir que l'état d'authentification a changé.
       window.dispatchEvent(new Event("auth-changed"));
     }
   }

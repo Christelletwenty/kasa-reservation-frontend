@@ -4,6 +4,7 @@ import { deleteProperty } from "@/app/lib/properties-api";
 import { useState } from "react";
 import styles from "./DeletePropertyModal.module.css";
 
+// Définition du type des props attendues par le composant.
 type DeletePropertyModalProps = {
   isOpen: boolean;
   propertyId: string;
@@ -20,6 +21,8 @@ export default function DeletePropertyModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Si la modal n’est pas ouverte, on ne rend rien dans le DOM.
+  // Cela évite d’afficher la fenêtre de confirmation inutilement.
   if (!isOpen) {
     return null;
   }
@@ -29,7 +32,10 @@ export default function DeletePropertyModal({
       setIsLoading(true);
       setError(null);
 
+      // Appel API qui supprime la propriété correspondant à l'id reçu en prop.
       await deleteProperty(propertyId);
+      // Si la suppression réussit, on prévient le composant parent.
+      // Le parent pourra fermer la modal, recharger les données, etc.
       onConfirm();
     } catch (err) {
       setError("Erreur lors de la suppression de la propriété");

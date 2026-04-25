@@ -11,6 +11,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // État contenant les données du formulaire
+  // Chaque champ est contrôlé par React grâce à value + onChange
   const [form, setForm] = useState<AuthRegister>({
     name: "",
     email: "",
@@ -21,6 +23,14 @@ export default function RegisterPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+
+    // Vérification côté frontend du mot de passe
+    // Même si le backend doit aussi vérifier, ça améliore l'expérience utilisateur
+    if (!form.password || form.password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -30,20 +40,34 @@ export default function RegisterPage() {
         return;
       }
 
+      // Sauvegarde du token reçu après inscription
+      // Il servira à authentifier les futures requêtes utilisateur
       setToken(registerResponse.token);
+      // Sauvegarde des informations utilisateur dans le sessionStorage
+      // sessionStorage garde les données tant que l'onglet reste ouvert
       sessionStorage.setItem(
         USER_STORAGE_KEY,
         JSON.stringify(registerResponse.user),
       );
       router.replace("/properties");
+      // Force Next.js à rafraîchir les données côté client/serveur
       router.refresh();
       return;
     } catch (err) {
-      const error =
-        err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(error);
+      let message = "Une erreur est survenue";
+      if (err instanceof Error) {
+        if (err.message.toLowerCase() === "email already registered") {
+          message = "Email déjà utilisé";
+        } else {
+          message = err.message;
+        }
+      }
+      setError(message);
     } finally {
       setLoading(false);
+      // Déclenche un événement global personnalisé
+      // D'autres composants peuvent écouter "auth-changed"
+      // pour se mettre à jour après connexion/inscription
       window.dispatchEvent(new Event("auth-changed"));
     }
   }
@@ -92,6 +116,7 @@ export default function RegisterPage() {
             type="password"
             id="password"
             required
+            minLength={6}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />

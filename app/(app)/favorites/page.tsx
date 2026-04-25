@@ -10,6 +10,8 @@ export default function FavoritesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Récupère l'id de l'utilisateur actuellement connecté
+  // Cet id est utilisé pour savoir si l'utilisateur est aussi l'hôte d'un logement
   const currentUserId = getStoredUserId();
 
   useEffect(() => {
@@ -18,6 +20,8 @@ export default function FavoritesPage() {
         setLoading(true);
         setError("");
 
+        // Appel API pour récupérer les favoris de l'utilisateur connecté
+        // Le "!" indique à TypeScript que getStoredUserId() ne sera pas null ici
         const favoritesResponse = await getFavoritesUsers(getStoredUserId()!);
         setProperties(favoritesResponse);
       } catch (err) {

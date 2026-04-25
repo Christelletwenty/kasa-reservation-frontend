@@ -3,6 +3,14 @@
 import { AuthResponse } from "../types/auth";
 import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from "./config";
 
+/**
+ * Sauvegarde les informations d'authentification dans le sessionStorage.
+ *
+ * Cette fonction est généralement appelée juste après un login réussi.
+ * Elle stocke :
+ * - le token d'authentification
+ * - les informations de l'utilisateur connecté
+ */
 export function saveAuth(data: AuthResponse): void {
   sessionStorage.setItem(TOKEN_STORAGE_KEY, data.token);
   sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));

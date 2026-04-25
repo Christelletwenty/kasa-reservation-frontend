@@ -8,6 +8,7 @@ import { BACKEND_URL } from "@/app/lib/config";
 import { getUserById, updateUserById } from "@/app/lib/users-api";
 import { uploadImage } from "@/app/lib/upload-api";
 
+// Type représentant l'état du formulaire.
 type FormState = {
   name: string;
   picture: string | null;
@@ -15,9 +16,11 @@ type FormState = {
 };
 
 export default function MyProfilePage() {
+  // Récupère l'id de l'utilisateur connecté depuis le stockage session.
   const currentUserId = getStoredUserId();
 
   const [user, setUser] = useState<User | null>(null);
+  // Stocke les valeurs affichées dans le formulaire.
   const [form, setForm] = useState<FormState>({
     name: "",
     picture: null,
@@ -36,6 +39,7 @@ export default function MyProfilePage() {
 
   useEffect(() => {
     const loadUser = async () => {
+      // Si aucun id utilisateur n'est trouvé, on ne peut pas charger le profil.
       if (!currentUserId) {
         setError("Impossible de récupérer l'utilisateur connecté.");
         setLoading(false);
@@ -50,12 +54,14 @@ export default function MyProfilePage() {
         const fetchedUser = await getUserById(Number(currentUserId));
 
         setUser(fetchedUser);
+        // On initialise le formulaire avec les données reçues.
         setForm({
           name: fetchedUser.name ?? "",
           picture: fetchedUser.picture ?? null,
           role: fetchedUser.role ?? "",
         });
 
+        // On initialise aussi l'aperçu de l'image.
         setPicturePreview(fetchedUser.picture ?? null);
         setSelectedFile(null);
         setRemovePicture(false);
@@ -70,9 +76,12 @@ export default function MyProfilePage() {
       }
     };
 
+    // On appelle la fonction async sans attendre son résultat directement dans useEffect.
     void loadUser();
   }, [currentUserId]);
 
+  // Remet le formulaire dans l'état exact de l'utilisateur actuel.
+  // Utilisé quand on annule l'édition ou après une sauvegarde.
   const resetFormFromUser = (currentUser: User) => {
     setForm({
       name: currentUser.name ?? "",
@@ -85,22 +94,29 @@ export default function MyProfilePage() {
     setRemovePicture(false);
   };
 
+  // Détermine quelle image afficher dans la balise <img>.
   const getPictureSrc = (): string => {
+    // Si l'utilisateur a supprimé sa photo ou s'il n'y en a pas,
+    // on affiche une image par défaut.
     if (removePicture || !picturePreview) {
       return "/default-avatar.png";
     }
 
+    // Si l'image est déjà une URL complète, on l'utilise directement.
+    // Sinon, on ajoute l'URL du backend devant le chemin.
     return picturePreview.startsWith("http")
       ? picturePreview
       : `${BACKEND_URL}${picturePreview}`;
   };
 
+  // Active le mode édition.
   const handleStartEdit = () => {
     setError("");
     setSuccess("");
     setIsEditing(true);
   };
 
+  // Annule les modifications et restaure les valeurs d'origine.
   const handleCancelEdit = () => {
     if (!user) return;
 
@@ -110,6 +126,8 @@ export default function MyProfilePage() {
     setIsEditing(false);
   };
 
+  // Met à jour un champ du formulaire.
+  // Ici seul le champ "name" est modifiable.
   const handleInputChange = (field: "name", value: string) => {
     setForm((prev) => ({
       ...prev,
@@ -117,15 +135,21 @@ export default function MyProfilePage() {
     }));
   };
 
+  // Déclenché lorsqu'un utilisateur choisit une nouvelle image.
   const handlePictureChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // On garde le fichier sélectionné pour pouvoir l'envoyer au backend au moment du save.
     setSelectedFile(file);
+    // Si une nouvelle image est sélectionnée, on annule l'état "suppression".
     setRemovePicture(false);
+    // Crée une URL temporaire locale pour afficher immédiatement un aperçu.
     setPicturePreview(URL.createObjectURL(file));
   };
 
+  // Supprime la photo côté interface.
+  // La suppression réelle côté backend sera faite au moment de la sauvegarde.
   const handleRemovePicture = () => {
     setSelectedFile(null);
     setRemovePicture(true);
@@ -137,6 +161,7 @@ export default function MyProfilePage() {
     }));
   };
 
+  // Sauvegarde les modifications du profil.
   const handleSave = async () => {
     if (!currentUserId || !user) {
       setError("Utilisateur introuvable.");
@@ -148,10 +173,15 @@ export default function MyProfilePage() {
       setError("");
       setSuccess("");
 
+      // Par défaut, on conserve l'image actuelle.
       let nextPicture = user.picture ?? null;
 
+      // Si l'utilisateur a demandé la suppression de l'image,
+      // on envoie une valeur vide au backend.
       if (removePicture) {
         nextPicture = "";
+        // Sinon, s'il a choisi un nouveau fichier,
+        // on upload l'image avant de mettre à jour le profil.
       } else if (selectedFile) {
         const uploadedImage = await uploadImage(selectedFile, "user-picture");
         nextPicture = uploadedImage.url;

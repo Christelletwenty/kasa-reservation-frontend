@@ -9,6 +9,7 @@ import Link from "next/link";
 import { User } from "@/app/types/users";
 import { BACKEND_URL } from "@/app/lib/config";
 
+// Type représentant une conversation dans la liste de gauche.
 type Conversation = {
   id: number;
   userId: number;
@@ -17,6 +18,7 @@ type Conversation = {
   unread?: boolean;
 };
 
+// Type représentant un message dans une conversation.
 type Message = {
   id: number;
   sender: "other" | "me";
@@ -25,6 +27,8 @@ type Message = {
   date?: string;
 };
 
+// Données temporaires simulant des conversations.
+// Plus tard, ces données pourront venir d'une API.
 const mockConversations: Conversation[] = [
   {
     id: 1,
@@ -58,6 +62,8 @@ const mockConversations: Conversation[] = [
   },
 ];
 
+// Objet qui stocke les messages par id de conversation.
+// Exemple : la conversation 1 contient une liste de messages.
 const mockMessagesByConversation: Record<number, Message[]> = {
   1: [
     {
@@ -110,31 +116,44 @@ export default function MessagesPage() {
   const currentUserId = getStoredUserId();
   const isLoggedIn = currentUserId !== null;
   const [usersById, setUsersById] = useState<Record<number, User>>({});
+  // Référence vers le conteneur HTML qui affiche les messages.
+  // On l'utilise pour scroller automatiquement vers le bas.
   const messagesBodyRef = useRef<HTMLDivElement | null>(null);
+  // Stocke les messages par conversation.
+  // On initialise avec les messages mockés.
   const [messagesByConversation, setMessagesByConversation] = useState<
     Record<number, Message[]>
   >(mockMessagesByConversation);
 
+  // Recherche la conversation actuellement sélectionnée.
   const selectedConversation = mockConversations.find(
     (conversation) => conversation.id === selectedConversationId,
   );
 
+  // Récupère les messages de la conversation sélectionnée.
+  // Si aucun message n'existe encore pour cette conversation, on retourne un tableau vide.
   const messages = messagesByConversation[selectedConversationId] ?? [];
 
   useEffect(() => {
     const loadUsers = async () => {
+      // On récupère tous les ids utilisateurs présents dans les conversations.
+      // Set permet d'éviter les doublons.
       const uniqueUserIds = [
         ...new Set(
           mockConversations.map((conversation) => conversation.userId),
         ),
       ];
 
+      // On ajoute aussi l'utilisateur connecté, car on doit afficher son nom/avatar
+      // dans les messages envoyés par "me".
       if (currentUserId) {
         uniqueUserIds.push(currentUserId);
       }
 
+      // On garde uniquement les utilisateurs qui ne sont pas déjà chargés.
       const missingUserIds = uniqueUserIds.filter((id) => !usersById[id]);
 
+      // Si tous les utilisateurs sont déjà en mémoire, on ne fait rien.
       if (missingUserIds.length === 0) {
         return;
       }
@@ -143,6 +162,7 @@ export default function MessagesPage() {
         missingUserIds.map((id) => getUserById(id)),
       );
 
+      // On met à jour usersById sans écraser les utilisateurs déjà présents.
       setUsersById((previous) => {
         const next = { ...previous };
 
@@ -154,28 +174,35 @@ export default function MessagesPage() {
       });
     };
 
+    // Le "void" indique qu'on ignore volontairement la Promise retournée.
     void loadUsers();
   }, [usersById, currentUserId]);
 
   useEffect(() => {
+    // Dès qu'on change de conversation ou que les messages changent,
+    // on scroll automatiquement tout en bas de la zone de messages.
     if (messagesBodyRef.current) {
       messagesBodyRef.current.scrollTop = messagesBodyRef.current.scrollHeight;
     }
   }, [selectedConversationId, messages]);
 
   useEffect(() => {
+    // Si l'utilisateur n'est pas connecté, on le redirige vers la page login.
     if (!isLoggedIn) {
       router.push("/login");
     }
   }, [isLoggedIn, router]);
 
   function sendMessage() {
+    // On retire les espaces inutiles au début et à la fin du message.
     const trimmedMessage = message.trim();
 
+    // Si le message est vide, on arrête la fonction.
     if (!trimmedMessage) {
       return;
     }
 
+    // Création du nouveau message envoyé par l'utilisateur connecté.
     const newMessage: Message = {
       id: Date.now(),
       sender: "me",
@@ -183,6 +210,7 @@ export default function MessagesPage() {
       time: "À l'instant",
     };
 
+    // On ajoute le message dans la conversation sélectionnée.
     setMessagesByConversation((previous) => ({
       ...previous,
       [selectedConversationId]: [
@@ -191,8 +219,11 @@ export default function MessagesPage() {
       ],
     }));
 
+    // On vide le textarea après l'envoi.
     setMessage("");
 
+    // Simulation d'une réponse automatique après 1,5 seconde.
+    // Plus tard, cette partie pourra être remplacée par une vraie API ou du temps réel.
     setTimeout(() => {
       const replyMessage: Message = {
         id: Date.now() + 1,

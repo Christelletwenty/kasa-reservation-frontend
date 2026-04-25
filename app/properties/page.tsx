@@ -17,6 +17,13 @@ export default function PropertiesPage() {
 
   const isLoggedIn = currentUserId !== null;
 
+  /**
+   * EFFECT: Chargement initial des données
+   *
+   * - Récupère l’utilisateur courant
+   * - Charge les propriétés
+   * - Charge les favoris si user connecté
+   */
   useEffect(() => {
     const userId = getStoredUserId();
     setCurrentUserId(userId);
@@ -26,13 +33,16 @@ export default function PropertiesPage() {
         setLoading(true);
         setError("");
 
+        // Récupération des propriétés
         const propertiesResponse = await getProperties();
         setProperties(propertiesResponse);
 
+        // Si utilisateur connecté → récupération des favoris
         if (userId !== null) {
           const favoritesResponse = await getFavoritesUsers(userId);
           setFavProperties(favoritesResponse);
         } else {
+          // Pas connecté → aucun favori
           setFavProperties([]);
         }
       } catch (err) {

@@ -10,6 +10,7 @@ import { getStoredUserId } from "@/app/lib/auth-guard";
 
 export default function PropertyDetailPage() {
   const router = useRouter();
+  // Permet de récupérer les paramètres dynamiques de l'URL
   const params = useParams();
 
   const [property, setProperty] = useState<Property | null>(null);
@@ -19,9 +20,12 @@ export default function PropertyDetailPage() {
   const id = params.id as string;
   const currentUserId = getStoredUserId();
   const isLoggedIn = currentUserId !== null;
+  // Vérifie si l'utilisateur connecté est le propriétaire du logement
+  // On convertit les deux valeurs en string pour éviter les problèmes de comparaison number/string
   const isOwner = String(currentUserId) === String(property?.host.id);
 
   useEffect(() => {
+    // Si aucun ID n'est trouvé dans l'URL, on affiche une erreur
     if (!id) {
       setError("ID du logement non trouvé");
       setLoading(false);
@@ -31,7 +35,9 @@ export default function PropertyDetailPage() {
       try {
         setLoading(true);
         setError("");
+        // Appel API pour récupérer le logement correspondant à l'id
         const propertyResponse = await getPropertyById(id);
+        // On stocke le logement récupéré dans le state
         setProperty(propertyResponse);
       } catch (err) {
         setError("Erreur lors du chargement du logement");
@@ -39,8 +45,9 @@ export default function PropertyDetailPage() {
         setLoading(false);
       }
     };
+    // Appelle la fonction de récupération du logement
     fetchProperty();
-  }, [id]);
+  }, [id]); // Le useEffect se relance si l'id change
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -49,6 +56,7 @@ export default function PropertyDetailPage() {
     return <div>{error}</div>;
   }
 
+  // Si aucun logement n'est trouvé après le chargement
   if (!property) {
     return <div>Logement non trouvée</div>;
   }

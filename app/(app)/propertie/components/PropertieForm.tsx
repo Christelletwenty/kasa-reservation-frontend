@@ -8,9 +8,13 @@ import { BACKEND_URL } from "@/app/lib/config";
 import { uploadImage } from "@/app/lib/upload-api";
 import { updateUserById } from "@/app/lib/users-api";
 
+// Définition des props attendues par le composant.
 type PropertiesProps = {
+  // Propriété optionnelle : si elle existe, le formulaire est prérempli en mode édition.
   property?: Property;
+  // Utilisateur connecté, utilisé notamment pour définir l'hôte de la propriété.
   currentUser: User;
+  // Fonction appelée lorsque le formulaire est validé
   onSubmit: (form: CreateProperty) => void;
 };
 
@@ -27,14 +31,18 @@ export default function PropertieForm({
   const isEditMode = Boolean(property);
 
   useEffect(() => {
+    // Sécurité : si currentUser n'existe pas encore, on ne fait rien.
     if (!currentUser) return;
 
+    // On met à jour uniquement `host_id`, en conservant le reste du formulaire.
     setForm((prev) => ({
       ...prev,
       host_id: currentUser.id,
     }));
   }, [currentUser]);
 
+  // Liste statique des équipements possibles.
+  // Elle sert à générer les checkboxes dans le formulaire.
   const possibleEquipments = [
     "Micro-Ondes",
     "Douche italienne",
@@ -62,6 +70,8 @@ export default function PropertieForm({
     "Vue Parc",
   ];
 
+  // Liste statique des catégories proposées à l'utilisateur.
+  // L'utilisateur peut aussi ajouter ses propres tags personnalisés plus bas.
   const possibleCategories = [
     "Parc",
     "Night Life",
@@ -73,6 +83,7 @@ export default function PropertieForm({
     "Famille",
     "Forêt",
   ];
+  // État principal du formulaire.
   const [form, setForm] = useState<CreateProperty>({
     title: "",
     description: "",
@@ -85,6 +96,7 @@ export default function PropertieForm({
     tags: [],
   });
 
+  // Ce useEffect est utilisé pour préremplir le formulaire en mode édition.
   useEffect(() => {
     if (property) {
       setForm({
@@ -101,18 +113,25 @@ export default function PropertieForm({
     }
   }, [property, currentUser]);
 
+  // Priorité à `profilePicture`, car c'est la nouvelle image uploadée localement.
+  // Si aucune nouvelle image n'a été uploadée, on utilise celle du currentUser.
   const pictureToDisplay = profilePicture ?? currentUser?.picture;
 
+  // Supprime une image du logement à partir de son index dans le tableau.
   const handleRemovePicture = (indexToRemove: number) => {
     setForm((prev) => ({
       ...prev,
+      // On recrée un tableau en gardant toutes les images sauf celle à supprimer.
       pictures: (prev.pictures ?? []).filter(
         (_, index) => index !== indexToRemove,
       ),
     }));
   };
 
+  // Supprime la photo de profil de l'utilisateur courant.
+  // La suppression est faite côté backend en mettant `picture` à une chaîne vide.
   const handleRemoveProfilePicture = async () => {
+    // Sécurité : si aucun utilisateur courant n'est disponible, on arrête la fonction.
     if (!currentUser) return;
 
     try {
@@ -124,6 +143,7 @@ export default function PropertieForm({
       });
 
       setProfilePicture(null);
+      // On demande à Next.js de rafraîchir les données affichées.
       router.refresh();
     } catch (err) {
       const message =
@@ -136,10 +156,15 @@ export default function PropertieForm({
     }
   };
 
+  // Gère le changement de photo de profil.
+  // Cette fonction est appelée lorsqu'un utilisateur sélectionne un fichier image.
   const handleProfilePictureChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    // On récupère le premier fichier sélectionné.
     const file = e.target.files?.[0];
+    // Si aucun fichier n'est sélectionné ou si aucun utilisateur n'est disponible,
+    // on arrête la fonction.
     if (!file || !currentUser) return;
 
     try {
@@ -165,16 +190,21 @@ export default function PropertieForm({
     }
   };
 
+  // Gère l'upload de l'image de couverture de la propriété.
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    // Si aucun fichier n'est choisi, on ne fait rien.
     if (!file) return;
 
     try {
       setLoading(true);
       setError("");
 
+      // Upload du fichier côté backend.
       const uploadedImage = await uploadImage(file, "property-cover");
 
+      // On met à jour le champ `cover` dans le formulaire.
+      // BACKEND_URL est ajouté devant l'URL relative retournée par l'API.
       setForm((prev) => ({
         ...prev,
         cover: `${BACKEND_URL}${uploadedImage.url}`,
@@ -190,6 +220,7 @@ export default function PropertieForm({
     }
   };
 
+  // Gère l'upload de plusieurs images du logement.
   const handlePicturesChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -200,14 +231,19 @@ export default function PropertieForm({
       setLoading(true);
       setError("");
 
+      // `files` est une FileList, pas un vrai tableau.
+      // On utilise Array.from(files) pour pouvoir utiliser `.map()` dessus.
+      // Promise.all permet d'attendre que tous les uploads soient terminés.
       const uploadedImages = await Promise.all(
         Array.from(files).map((file) => uploadImage(file, "property-picture")),
       );
 
+      // On transforme les réponses de l'API en URLs complètes utilisables dans les images.
       const uploadedUrls = uploadedImages.map(
         (image) => `${BACKEND_URL}${image.url}`,
       );
 
+      // On ajoute les nouvelles images à celles déjà présentes dans le formulaire.
       setForm((prev) => ({
         ...prev,
         pictures: [...(prev.pictures ?? []), ...uploadedUrls],
@@ -223,10 +259,13 @@ export default function PropertieForm({
     }
   };
 
+  // Raccourci pratique pour éviter d'écrire `form.pictures ?? []` partout dans le JSX.
   const pictures = form.pictures ?? [];
 
+  // Même logique pour les tags : on garantit toujours un tableau.
   const tags = form.tags ?? [];
 
+  // Liste finale des catégories à afficher.
   const allCategories = [
     ...possibleCategories,
     ...tags.filter((tag) => !possibleCategories.includes(tag)),

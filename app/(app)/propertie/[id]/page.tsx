@@ -6,7 +6,6 @@ import { CreateProperty, Property } from "@/app/types/properties";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getPropertyById, updateProperty } from "@/app/lib/properties-api";
-import { User } from "@/app/types/users";
 
 export default function UpdatePropertyPage() {
   const params = useParams();
@@ -16,9 +15,12 @@ export default function UpdatePropertyPage() {
   const [property, setProperty] = useState<Property | null>(null);
   const router = useRouter();
 
+  // Récupère l'id de la propriété depuis les paramètres de l'URL.
   const id = params.id as string;
 
   useEffect(() => {
+    // Si aucun id n'est trouvé dans l'URL,
+    // on affiche une erreur et on arrête le chargement.
     if (!id) {
       setError("ID du logement non trouvé");
       setLoading(false);
@@ -30,6 +32,7 @@ export default function UpdatePropertyPage() {
         setLoading(true);
         setError("");
         const propertyResponse = await getPropertyById(id);
+        // On stocke la propriété récupérée dans l'état React.
         setProperty(propertyResponse);
       } catch (err) {
         setError("Erreur lors du chargement du logement");
@@ -37,6 +40,8 @@ export default function UpdatePropertyPage() {
         setLoading(false);
       }
     };
+    // On exécute la fonction définie juste au-dessus.
+
     fetchProperty();
   }, [id]);
 

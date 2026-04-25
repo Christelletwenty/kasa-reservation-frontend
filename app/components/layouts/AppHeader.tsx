@@ -12,23 +12,36 @@ export default function AppHeader() {
   const router = useRouter();
 
   useEffect(() => {
+    // getStoredUserId() retourne probablement un id utilisateur s'il est connecté.
+    // Le double `!!` transforme la valeur en booléen :
+    // - valeur existante => true
+    // - null / undefined / "" => false
     const syncAuthState = () => {
       setIsUserLoggedIn(!!getStoredUserId());
     };
 
     syncAuthState();
 
+    // On écoute un événement personnalisé "auth-changed".
+    // Cet événement permet à d'autres parties de l'application
+    // de signaler qu'une connexion ou déconnexion a eu lieu.
     window.addEventListener("auth-changed", syncAuthState);
 
+    // Fonction de nettoyage exécutée quand le composant est démonté.
+    // Elle évite de laisser un event listener actif inutilement.
     return () => {
       window.removeEventListener("auth-changed", syncAuthState);
     };
   }, []);
 
   const handleLogout = () => {
+    // Supprime le token ou les informations d'authentification.
     clearToken();
     setIsUserLoggedIn(false);
+    // Déclenche l'événement "auth-changed" pour informer le reste de l'application
+    // que l'état d'authentification a changé.
     window.dispatchEvent(new Event("auth-changed"));
+    // Redirige l'utilisateur vers la page de connexion.
     router.push("/login");
   };
 
