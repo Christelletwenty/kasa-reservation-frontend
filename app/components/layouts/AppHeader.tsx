@@ -49,28 +49,40 @@ export default function AppHeader() {
     <header className={styles.headerWrapper}>
       <nav className={styles.header}>
         <div className={styles.headerLeft}>
-          <Link href="/properties">Accueil</Link>
-          <Link href="/about">À propos</Link>
-          <Link href="/profile">Mon profil</Link>
+          <Link aria-label="Aller à l'accueil" href="/properties">
+            Accueil
+          </Link>
+          <Link aria-label="A propos" href="/about">
+            À propos
+          </Link>
+          <Link aria-label="Voir le profil" href="/profile">
+            Mon profil
+          </Link>
         </div>
         <div className={styles.headerCenter}>
-          <Link href="/properties">
+          <Link aria-label="Voir les propriétés" href="/properties">
             <img src="/kasa-logo.svg" alt="Kasa" width={120} height={40} />
           </Link>
         </div>
         <div className={styles.headerRight}>
-          <Link href="/propertie">+ Ajouter un logement</Link>
+          <Link aria-label="Ajout de logement" href="/propertie">
+            + Ajouter un logement
+          </Link>
           <div className={styles.headerIcons}>
-            <Link href="/favorites">
+            <Link aria-label="Voir les favoris" href="/favorites">
               <img src="/heart-icon.svg" alt="Favoris" width={20} height={20} />
             </Link>
             <img src="/line.svg" alt="Séparateur" width={1} height={20} />
-            <Link href="/messages">
+            <Link aria-label="Aller aux messages" href="/messages">
               <img src="/comment.svg" alt="Messages" width={20} height={20} />
             </Link>
             <img src="/line.svg" alt="Séparateur" width={1} height={20} />
             {isUserLoggedIn ? (
-              <button className={styles.logoutButton} onClick={handleLogout}>
+              <button
+                aria-label="Se déconnecter"
+                className={styles.logoutButton}
+                onClick={handleLogout}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -87,7 +99,7 @@ export default function AppHeader() {
                 </svg>
               </button>
             ) : (
-              <Link href="/login">
+              <Link aria-label="Se connecter" href="/login">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

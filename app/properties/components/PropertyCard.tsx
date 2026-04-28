@@ -109,6 +109,7 @@ export default function PropertyCard({
         {error && <p className={styles.properties__error}>{error}</p>}
         {canFavorite && (
           <button
+            aria-label="Favoris"
             onClick={handleFavorite}
             disabled={isLoading}
             className={`${styles.properties__favorites} ${isFavorite ? styles.properties__favoritesActive : ""}`}
@@ -132,6 +133,7 @@ export default function PropertyCard({
 
         {canDelete && (
           <button
+            aria-label="Supprimer"
             className={styles.deleteButton_modal}
             onClick={handleOpenDeleteModal}
             disabled={isLoading}
@@ -155,6 +157,7 @@ export default function PropertyCard({
 
         {canEdit && (
           <Link
+            aria-label="Modifier la propriété"
             href={`/propertie/${property.id}`}
             onClick={(e) => e.stopPropagation()}
             className={styles.updateButton_modal}
