@@ -403,6 +403,7 @@ export default function MessagesPage() {
 
         <form className={styles.messageComposer}>
           <textarea
+            aria-label="Envoyer un message"
             className={styles.messageInput}
             placeholder="Envoyer un message"
             value={message}

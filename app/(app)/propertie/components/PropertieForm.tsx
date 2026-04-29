@@ -1,7 +1,7 @@
 "use client";
 import { CreateProperty, Property } from "@/app/types/properties";
 import styles from "./CreateProperty.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/types/users";
 import { BACKEND_URL } from "@/app/lib/config";
@@ -29,6 +29,9 @@ export default function PropertieForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const isEditMode = Boolean(property);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const propertyImagesInputRef = useRef<HTMLInputElement>(null);
+  const profileImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Sécurité : si currentUser n'existe pas encore, on ne fait rien.
@@ -418,15 +421,18 @@ export default function PropertieForm({
                   {form.cover ? "Image ajoutée" : ""}
                 </div>
 
-                <label
-                  htmlFor="coverImage"
+                <button
+                  type="button"
                   className={styles.imageField__button}
+                  aria-label="Ajouter une image de couverture"
+                  onClick={() => coverImageInputRef.current?.click()}
                 >
                   +
-                </label>
+                </button>
               </div>
 
               <input
+                ref={coverImageInputRef}
                 id="coverImage"
                 name="coverImage"
                 type="file"
@@ -468,15 +474,18 @@ export default function PropertieForm({
                     : ""}
                 </div>
 
-                <label
-                  htmlFor="propertyImage1"
+                <button
+                  type="button"
                   className={styles.imageField__button}
+                  aria-label="Ajouter une image du logement"
+                  onClick={() => propertyImagesInputRef.current?.click()}
                 >
                   +
-                </label>
+                </button>
               </div>
 
               <input
+                ref={propertyImagesInputRef}
                 id="propertyImage1"
                 name="propertyImages"
                 type="file"
@@ -516,9 +525,7 @@ export default function PropertieForm({
           </div>
 
           <div className={styles.hostCard}>
-            <label htmlFor="hostName" className={styles.imageField__label}>
-              Nom de l'hôte
-            </label>
+            <p className={styles.imageField__label}>Nom de l'hôte</p>
             <p className={styles.createProperty__hostname}>
               {currentUser.name ?? ""}
             </p>
@@ -531,15 +538,18 @@ export default function PropertieForm({
                 {currentUser.picture ? "Image ajoutée" : "Aucune image"}
               </div>
 
-              <label
-                htmlFor="profileImage"
+              <button
+                type="button"
                 className={styles.imageField__button}
+                aria-label="Ajouter une photo de profil"
+                onClick={() => profileImageInputRef.current?.click()}
               >
                 +
-              </label>
+              </button>
             </div>
 
             <input
+              ref={profileImageInputRef}
               id="profileImage"
               name="profileImage"
               type="file"
