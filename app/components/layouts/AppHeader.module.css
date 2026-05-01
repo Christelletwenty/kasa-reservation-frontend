@@ -56,3 +56,115 @@
 .logoutButton {
   cursor: pointer;
 }
+
+.burger {
+  color: transparent;
+  position: relative;
+  width: 32px;
+  height: 3px;
+  background: #000;
+  border-radius: 999px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+  display: none;
+}
+
+.burger::before,
+.burger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 32px;
+  height: 3px;
+  background: #000;
+  border-radius: 999px;
+  transition:
+    transform 0.3s ease,
+    top 0.3s ease,
+    bottom 0.3s ease;
+}
+
+.burger::before {
+  top: -10px;
+}
+
+.burger::after {
+  bottom: -10px;
+}
+
+.burger.active {
+  background: transparent;
+}
+
+.burger.active::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.burger.active::after {
+  bottom: 0;
+  transform: rotate(-45deg);
+}
+
+.mobileMenu,
+.headerMobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .header {
+    position: sticky;
+    z-index: 10;
+  }
+
+  .header > :not(.headerMobile) {
+    display: none;
+  }
+
+  .linkButton {
+    color: #fff;
+    background: #99331a;
+    box-shadow: 0 8px 20px #a63d1d2e;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+      transform 0.15s,
+      opacity 0.15s,
+      box-shadow 0.2s,
+      background 0.2s;
+  }
+
+  .headerMobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .burger {
+    display: block;
+  }
+
+  .mobileMenu {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9;
+  }
+
+  .mobileMenu a {
+    height: auto;
+    padding: 1rem;
+  }
+}

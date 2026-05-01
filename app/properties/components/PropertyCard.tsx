@@ -76,25 +76,9 @@ export default function PropertyCard({
   const handleOpenDeleteModal = (
     e: React.MouseEvent<HTMLButtonElement>,
   ): void => {
+    console.log("teeeeese");
     // Empêche la navigation vers le détail quand on clique sur supprimer
     e.stopPropagation();
-    setDeleteModal(true);
-  };
-
-  // Ferme la modal de suppression
-  const handleCloseDeleteModal = (
-    e?: React.MouseEvent<HTMLButtonElement>,
-  ): void => {
-    // Le ? permet d’appeler stopPropagation uniquement si e existe
-    e?.stopPropagation();
-    setDeleteModal(false);
-  };
-
-  // Fonction appelée quand la suppression a bien été confirmée dans la modal
-  const handleDeleteSuccess = (): void => {
-    setDeleteModal(false);
-    // On prévient le parent qu’une propriété a été supprimée
-    // Le ?. évite une erreur si onDelete n’a pas été fourni
     onDelete?.();
   };
 
@@ -187,13 +171,6 @@ export default function PropertyCard({
           {property.price_per_night}€ <span>par nuit</span>
         </p>
       </div>
-
-      <DeletePropertyModal
-        isOpen={deleteModal}
-        propertyId={property.id}
-        onClose={handleCloseDeleteModal}
-        onConfirm={handleDeleteSuccess}
-      />
     </div>
   );
 }

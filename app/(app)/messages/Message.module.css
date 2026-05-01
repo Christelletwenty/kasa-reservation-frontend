@@ -311,6 +311,10 @@
   font-size: 18px;
 }
 
+.mobileBackButton {
+  display: none;
+}
+
 @media (max-width: 1100px) {
   .messagesPage {
     grid-template-columns: 320px 1fr;
@@ -322,17 +326,78 @@
 }
 
 @media (max-width: 820px) {
+  .mobileBackButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .messagesPage {
     grid-template-columns: 1fr;
-    height: auto;
+    height: calc(100vh - 120px);
+    position: relative;
   }
 
   .messagesSidebar {
+    display: flex;
     border-right: none;
-    border-bottom: 1px solid #e6e1de;
   }
 
   .messagesContent {
-    min-height: 70vh;
+    display: none;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .messagesPageConversationOpen .messagesSidebar {
+    display: none;
+  }
+
+  .messagesPageConversationOpen .messagesContent {
+    display: flex;
+  }
+
+  .mobileBackButton {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #983314;
+    font-size: 24px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+  }
+
+  .messagesBody {
+    padding: 74px 16px 18px;
+  }
+
+  .messageComposer {
+    padding: 14px;
+  }
+
+  .messageInput {
+    min-height: 86px;
+    padding: 16px 64px 16px 16px;
+    font-size: 16px;
+  }
+
+  .sendButton {
+    right: 24px;
+    bottom: 24px;
+  }
+
+  .messageContent,
+  .messageContentMe {
+    max-width: min(260px, 75vw);
+  }
+
+  .title {
+    font-size: 42px;
   }
 }

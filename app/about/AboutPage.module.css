@@ -55,6 +55,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 64px;
+  flex-wrap: wrap;
 }
 
 .about__missioncontent {

@@ -47,7 +47,7 @@
 }
 .properties__cards {
   display: grid;
-  grid-template-columns: repeat(3, 300px);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   width: fit-content;
   max-width: 100%;

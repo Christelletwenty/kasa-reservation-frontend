@@ -109,6 +109,8 @@ const mockMessagesByConversation: Record<number, Message[]> = {
 export default function MessagesPage() {
   const [selectedConversationId, setSelectedConversationId] =
     useState<number>(1);
+  const [isMobileConversationOpen, setIsMobileConversationOpen] =
+    useState(false);
   const [message, setMessage] = useState<string>("");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -247,7 +249,11 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className={styles.messagesPage}>
+    <div
+      className={`${styles.messagesPage} ${
+        isMobileConversationOpen ? styles.messagesPageConversationOpen : ""
+      }`}
+    >
       <section className={styles.messagesSidebar}>
         <div className={styles.messagesSidebarHeader}>
           <Link href="/properties" className={styles.backButton}>
@@ -267,7 +273,10 @@ export default function MessagesPage() {
                   ? styles.conversationCardActive
                   : ""
               }`}
-              onClick={() => setSelectedConversationId(conversation.id)}
+              onClick={() => {
+                setSelectedConversationId(conversation.id);
+                setIsMobileConversationOpen(true);
+              }}
             >
               <div className={styles.avatarPlaceholder}>
                 {usersById[conversation.userId]?.picture ? (
@@ -306,6 +315,13 @@ export default function MessagesPage() {
 
       <section className={styles.messagesContent}>
         <div ref={messagesBodyRef} className={styles.messagesBody}>
+          <button
+            type="button"
+            className={styles.mobileBackButton}
+            onClick={() => setIsMobileConversationOpen(false)}
+          >
+            ←
+          </button>
           {selectedConversation ? (
             messages.map((msg, index) => {
               const showDateSeparator =

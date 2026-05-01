@@ -235,3 +235,23 @@
 .properties__category {
   margin-top: 34px;
 }
+
+@media (max-width: 768px) {
+  .properties__detailImages {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .properties__mainImage {
+    height: 260px;
+  }
+
+  .properties__secondaryImages {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: none;
+
+    img {
+      height: 130px;
+    }
+  }
+}

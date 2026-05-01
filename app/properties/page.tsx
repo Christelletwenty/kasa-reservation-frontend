@@ -7,9 +7,11 @@ import styles from "./PropertiesPage.module.css";
 import { getProperties } from "../lib/properties-api";
 import { getFavoritesUsers } from "../lib/favorites-api";
 import { getStoredUserId } from "../lib/auth-guard";
+import DeletePropertyModal from "./components/DeletePropertyModal";
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
+  const [deletableProperty, setDeletableProperty] = useState<Property>();
   const [favProperties, setFavProperties] = useState<Property[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,12 @@ export default function PropertiesPage() {
       }
     })();
   }, []);
+
+  function deleteProperty(p: Property) {
+    setProperties((prev) => prev.filter((property) => property.id !== p.id));
+    setFavProperties((prev) => prev.filter((fav) => fav.id !== p.id));
+    setDeletableProperty(undefined);
+  }
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -97,10 +105,8 @@ export default function PropertiesPage() {
               }
             }}
             onDelete={() => {
-              setProperties((prev) =>
-                prev.filter((property) => property.id !== p.id),
-              );
-              setFavProperties((prev) => prev.filter((fav) => fav.id !== p.id));
+              console.log("test");
+              setDeletableProperty(p);
             }}
           />
         ))}
@@ -145,6 +151,17 @@ export default function PropertiesPage() {
           </div>
         </div>
       </div>
+
+      {!!deletableProperty ? (
+        <DeletePropertyModal
+          isOpen={!!deletableProperty}
+          propertyId={deletableProperty!.id}
+          onClose={() => setDeletableProperty(undefined)}
+          onConfirm={() => deleteProperty(deletableProperty)}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
 }
