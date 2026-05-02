@@ -1,5 +1,5 @@
 import { FavoritesResponse } from "../types/favorites";
-import { Properties } from "../types/properties";
+import { Property } from "../types/properties";
 import { apiFetch } from "./api";
 
 export function addPropertiesToFavorites(
@@ -19,8 +19,8 @@ export function deletePropertiesFromFavorites(
   });
 }
 
-export function getFavoritesUsers(id: number): Promise<Properties[]> {
-  return apiFetch<Properties[]>(`/api/users/${id}/favorites`, {
+export function getFavoritesUsers(id: number): Promise<Property[]> {
+  return apiFetch<Property[]>(`/api/users/${id}/favorites`, {
     method: "GET",
     auth: true,
   });
