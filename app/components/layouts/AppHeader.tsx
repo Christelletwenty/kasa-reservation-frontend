@@ -81,22 +81,35 @@ export default function AppHeader() {
             </Link>
           </div>
           <div className={styles.headerRight}>
-            <Link aria-label="Ajout de logement" href="/propertie">
-              + Ajouter un logement
-            </Link>
+            {isUserLoggedIn && (
+              <Link aria-label="Ajout de logement" href="/propertie">
+                + Ajouter un logement
+              </Link>
+            )}
+
             <div className={styles.headerIcons}>
-              <Link aria-label="Voir les favoris" href="/favorites">
-                <img
-                  src="/heart-icon.svg"
-                  alt="Favoris"
-                  width={20}
-                  height={20}
-                />
-              </Link>
-              <img src="/line.svg" alt="Séparateur" width={1} height={20} />
-              <Link aria-label="Aller aux messages" href="/messages">
-                <img src="/comment.svg" alt="Messages" width={20} height={20} />
-              </Link>
+              {isUserLoggedIn && (
+                <>
+                  <Link aria-label="Voir les favoris" href="/favorites">
+                    <img
+                      src="/heart-icon.svg"
+                      alt="Favoris"
+                      width={20}
+                      height={20}
+                    />
+                  </Link>
+                  <img src="/line.svg" alt="Séparateur" width={1} height={20} />
+                  <Link aria-label="Aller aux messages" href="/messages">
+                    <img
+                      src="/comment.svg"
+                      alt="Messages"
+                      width={20}
+                      height={20}
+                    />
+                  </Link>
+                </>
+              )}
+
               <img src="/line.svg" alt="Séparateur" width={1} height={20} />
               {isUserLoggedIn ? (
                 <button

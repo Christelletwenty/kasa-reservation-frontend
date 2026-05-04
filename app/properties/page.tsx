@@ -91,7 +91,9 @@ export default function PropertiesPage() {
           <PropertyCard
             key={p.id}
             property={p}
-            canFavorite={isLoggedIn}
+            canFavorite={
+              isLoggedIn && String(currentUserId) !== String(p.host.id)
+            }
             canEdit={currentUserId === p.host.id}
             canDelete={currentUserId === p.host.id}
             favorites={favProperties.some((fav) => fav.id === p.id)}

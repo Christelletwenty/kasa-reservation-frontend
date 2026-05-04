@@ -27,6 +27,19 @@
   display: block;
 }
 
+.properties__imageWrapper:not(:has(.properties__favorites))
+  .deleteButton_modal {
+  top: 12px;
+  right: 12px;
+  margin-right: 0;
+}
+
+.properties__imageWrapper:not(:has(.properties__favorites))
+  .updateButton_modal {
+  top: 12px;
+  right: 52px;
+}
+
 .properties__favorites {
   position: absolute;
   background-color: #f5f5f5;

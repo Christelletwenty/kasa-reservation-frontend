@@ -61,6 +61,19 @@ export default function PropertyDetailPage() {
     return <div>Logement non trouvée</div>;
   }
 
+  // On récupère la photo de profil de l'hôte depuis la propriété.
+  const hostPicture = property.host.picture;
+
+  // Ici on construit l'URL finale à utiliser dans la balise <img src="...">
+  const hostPictureSrc =
+    // On vérifie que hostPicture existe (pas null ou undefined) et qu'elle commence par "http"
+    hostPicture && hostPicture.startsWith("http")
+      ? hostPicture
+      : // Sinon, si hostPicture existe MAIS ne commence pas par "http" c'est une URL relative (ex: "/uploads/xxx.jpg")
+        hostPicture
+        ? `${BACKEND_URL}${hostPicture}`
+        : "";
+
   return (
     <div className={styles.properties__detailPage}>
       <button
@@ -159,10 +172,13 @@ export default function PropertyDetailPage() {
         <div className={styles.properties__detailHost}>
           <h2 className={styles.properties__detailHostTitle}>Votre hôte</h2>
           <div className={styles.properties__detailHostInfo}>
-            <img
-              src={`${property.host.picture.startsWith("http") ? "" : BACKEND_URL}${property.host.picture}`}
-              alt={property.host.picture}
-            />
+            {hostPictureSrc ? (
+              <img src={hostPictureSrc} alt={property.host.name} />
+            ) : (
+              <div className={styles.properties__hostPlaceholder}>
+                {property.host.name?.[0]?.toUpperCase() ?? "?"}
+              </div>
+            )}
             <p className={styles.properties__detailUserName}>
               {property.host.name}
             </p>
